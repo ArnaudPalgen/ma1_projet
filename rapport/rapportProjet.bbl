@@ -1,0 +1,9 @@
+\begin{thebibliography}{1}
+
+\bibitem{ESP-MESH}
+{\em ESP-MESH api guide}.
+\newblock 2018.
+\newblock
+  https://docs.espressif.com/projects/esp-idf/en/latest/api-guides/mesh.html.
+
+\end{thebibliography}
