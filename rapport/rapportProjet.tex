@@ -17,6 +17,8 @@
 \newcommand{\espmesh}{\textsc{esp-mesh}}
 \newcommand{\mac}{\textsc{mac}}
 \newcommand{\rssi}{\textsc{rssi}}
+\newcommand{\mesh}{\textsc{mesh}}
+\newcommand{\espnow}{\textsc{esp now}}
 \begin{document}
 %\pagenumbering{roman}
 
@@ -64,10 +66,17 @@ Arnaud \textsc{Palgen}
 
 \end{center}
 \end{titlepage}
+
+
+\chapter*{Introduction}
+    todo
+
 \tableofcontents
+\newpage
+
 \chapter{Etat de l'Art}
 
-\section{ESP-MESH}
+\section{ESP MESH}
     \espmesh\ est le protocol du constructeur Espressif permettant d'établir un réseau mesh avec des \esp.
     Cette section explique le fonctionnement de ce protocole.\\
     La topologie ici utilisée est l'arbre. La racine de l'arbre est la seule interface entre le
@@ -228,15 +237,32 @@ Arnaud \textsc{Palgen}
     \vspace{0.5cm}
     \textbf{Performances}\\
         Espressif fournit les performances d'\espmesh\ pour un réseau de 100 noeuds avec un nombre maximum de couches de 6 et un nombre d'enfants maximum par noeuds de 6.
-        \newline
+        %\newline
 
-        %\vspace{0.5cm}
-        \begin{tabular}{|l|l|}
-            \hline
-            Temps de construction du réseau & $<$ 60 secondes\\ \hline
-            Latence par saut & 10 à 30 millisecondes\\ \hline
-            Temps de réparation du réseau & \makecell{Si la racine tombe: $<$ 10 secondes \\ Si un noeud enfant tombe: $<$ 5 secondes}\\ \hline
-        \end{tabular}
+        \begin{table}[H]
+            \begin{tabular}{|l|l|}
+                \hline
+                Temps de construction du réseau & $<$ 60 secondes\\ \hline
+                Latence par saut & 10 à 30 millisecondes\\ \hline
+                Temps de réparation du réseau & \makecell{Si la racine tombe: $<$ 10 secondes \\ Si un noeud enfant tombe: $<$ 5 secondes}\\ \hline
+            \end{tabular}
+            \caption{Performances d'\espmesh\ \cite{ESP-MESH}}
+        \end{table}
+
+        
+    \textbf{Discussion}\\
+        A première vue, une topologie en arbre n'est pas robuste car si la racine tombe,
+        tout le reste du réseau est déconnecté. Cependant le processus d'élection
+        d'une nouvelle racines semble efficace selon les résulats fournis par Espressif.
+        Un point négatif du prorocole est que les tables de routage contiennent tous le sous arbre des noeuds.
+        On imagine donc difficilement utiliser ce protocole pour un nombre élevé de noeuds.
+
+\section{ESP NOW}
+    todo
+
+\section{Comparaison de protocoles de routage MESH}
+    todo
+
 
 %\listoffigures
 \bibliography{biblio.bib}{}
