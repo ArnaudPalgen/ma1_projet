@@ -13,8 +13,14 @@
 \usepackage{qtree}
 \usepackage{newfloat}
 \usepackage{moreverb}
-
-
+\usepackage{hyperref}
+%\usepackage[dvips]{hyperref}
+\hypersetup{
+colorlinks=true,
+linkcolor=red,           
+}
+\setcounter{tocdepth}{5} %pour l'apparition dans la table des matières des susubsections
+%\setcounter{secnumdepth}{5}%pour la numérotation dans le corps du document des susubsections
 
 %\pagestyle{fancy}
 %olsr
@@ -96,6 +102,17 @@ Arnaud \textsc{Palgen}
 \newpage
 
 \chapter{Etat de l'Art}
+\section{Présentation de l'ESP}
+    L'\esp\ est un système embarqué développé par Espressif dédié à L'intenet des objets.\\
+    Il est compatible WiFi et Bluetooth 2.4 GHz. Il a une consommation faible en énergie et
+    des mécanismes d'économies d'énergie.\\
+    Il est équipé de 34 pins GPIOs, d'un CPU Xtensa $^{\tiny{\textregistered}}$ single-/dual-core 32-bit LX6
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.4]{images/esp32-devkitc.jpg}
+        \caption{ESP32-DevKitC V4 with ESP32-WROOM-32 module \cite{esp32-gettingStarted_w}}
+        \label{esp32_img}
+    \end{figure}
 \section{Choix de l'environnement}
     Trois environnements s'offrent à nous:
     \begin{enumerate}
@@ -109,7 +126,7 @@ Arnaud \textsc{Palgen}
         \item \textbf{IoT Development Framework (IDF)}\\
             IDF est l'environnement du constucteur de l'\esp\ (Espressif). La documentation est complète mais le code source n'est pas entièrement disponible. Pour certaines
             parties du framework, nous n'avons accès qu'aux fichiers d'entête.\\
-            Ce framework est natif et nous apportera donc une plus grande fidélité à \esp. \\
+            Ce framework est natif et nous apportera donc une plus grande fidélité à l'\esp. \\
             Cet environnement nous donne aussi accès à des fonctionnalités de FreeRTOS (free real-time operating system).\\
             FreeRTOS est un système d'exploitation temps réel open source pour microcontrôleurs. Ses fonctionnalités pourront nous être utiles pour le projet.\\
 
@@ -123,7 +140,7 @@ Arnaud \textsc{Palgen}
 \section{Protocoles de routage}
     Dans cette section nous discuterons des différents protocoles de routage envisageables.\\
     Tout d'abord, nous établirons un classement des différents types de protocoles de routage \mesh. \\
-    Ensuite, nous etudierons et comparerons différents protocoles de routage MESH: \espmesh\ \cite{esp-mesh_w}, OLSR\cite{olsr_w}, AODV\cite{aodv_w} et DSR\cite{dsr_w}\\
+    Ensuite, nous etudierons et comparerons différents protocoles de routage mesh: \espmesh\ \cite{esp-mesh_w}, OLSR\cite{olsr_w}, AODV\cite{aodv_w} et DSR\cite{dsr_w}\\
     Enfin nous pourrons choisir un protocole à implémenter sur \esp.\\
     
     \subsection{Classification}
@@ -155,7 +172,7 @@ Arnaud \textsc{Palgen}
     \end{flushleft}
 
     \subsection{Etude des différents protocoles}
-    \underline{\textbf{ESP MESH}}\\
+    \subsubsection{\underline{ESP MESH}}%\underline{\textbf{ESP MESH}}\\
         \espmesh\ est le protocol du constructeur Espressif permettant d'établir un réseau mesh avec des \esp.
         Cette section explique le fonctionnement de ce protocole. La topologie utilisée ici est l'arbre.
         Il existe plusieurs types de noeuds:
@@ -172,6 +189,24 @@ Arnaud \textsc{Palgen}
             \includegraphics[scale=0.3]{images/mesh-node-types.png}
             \caption{Topologie d'un réseau \espmesh \cite{esp-mesh_w}}
         \end{figure}
+
+        \textbf{Routage}\newline
+        \begin{enumerate}
+            \item Table de routage\\
+                Chaque noeud possède sa table de routage. Soit $p$ un noeud, sa table de routage contient les addresses \mac\ 
+                des noeuds du sous-arbre ayant $p$ comme racine, et également celle de $p$.\\
+                Elle est partitionnée en sous-tables qui correspondent au sous-arbres des enfants de $p$.
+            \item Acheminement de paquets\\
+                Quand un paquet est reçu,
+                \begin{itemize}
+                    \item Si l'adresse \mac\ du paquet est dans la table de routage et si elle est différente de l'adresse du noeud l'ayant reçu, le paquet est envoyé
+                    à l'enfant correspondant à la sous-table contenant l'adresse.
+                    \item Si l'adresse n'est pas dans la table de routage, le paquet est envoyé au parent.
+                \end{itemize}
+                %\espmesh\ utilise un mécanisme de vérification de chemin pour détecter les boucles. Si une boucle arrive, un parent va prévenir son enfant et initier une déconnexion.
+
+        \end{enumerate}
+        \vspace{0.5cm}
 
         \textbf{Construction d'un réseau}
         \newline
@@ -233,23 +268,6 @@ Arnaud \textsc{Palgen}
         Pour éviter les boucles, un noeud ne va pas se connecter à un noeud dont l'adresse \mac\ se trouve dans sa table de routage.
         \vspace{0.5cm}
 
-        \textbf{Routage}\newline
-            \begin{enumerate}
-                \item Table de routage\\
-                    Chaque noeud possède sa table de routage. Soit $p$ un noeud, sa table de routage contient les addresses \mac\ 
-                    des noeuds du sous-arbre ayant $p$ comme racine, et également celle de $p$.\\
-                    Elle est partitionnée en sous-tables qui correspondent au sous-arbres des enfants de $p$.
-                \item Acheminement de paquets\\
-                    Quand un paquet est reçu,
-                    \begin{itemize}
-                        \item Si l'adresse \mac\ du paquet est dans la table de routage et si elle est différente de l'adresse du noeud l'ayant reçu, le paquet est envoyé
-                        à l'enfant correspondant à la sous-table contenant l'adresse.
-                        \item Si l'adresse n'est pas dans la table de routage, le paquet est envoyé au parent.
-                    \end{itemize}
-                    %\espmesh\ utilise un mécanisme de vérification de chemin pour détecter les boucles. Si une boucle arrive, un parent va prévenir son enfant et initier une déconnexion.
-
-            \end{enumerate}
-            \vspace{0.5cm}
         \textbf{Mise sous tension asynchrone}\newline
             La structure du réseau peut être affectée par l'ordre dans lequel les noeuds sont mis sous tension.
             Les noeuds ayant une mise en tension retardée suivront les deux règles suivantes:
@@ -373,9 +391,50 @@ Arnaud \textsc{Palgen}
     
 
     \vspace{2cm}
-    \underline{\textbf{OLSR}}\\
-        work in progress...\\
-    \underline{\textbf{AODV}}\\
+    \subsubsection{\underline{OLSR}}%\underline{\textbf{OLSR}}\\ ##########################
+    %##########################################################################
+        \textit{OLSR} est un protocole proactif à état de liens. Il fournit un support à certaines extensions comme
+        sleep mode operation, multicast-routing etc.\\
+        Ce protocole utilise deux types de messages:\\
+        \begin{enumerate}
+            \item \textit{hello}\\
+                Ces paquets sont envoyés à un saut. Ils sont utilisés pour constituer le voisinage et
+                l'ensemble des \textit{"multipoint relays" (MPR)}. (concept expliqué  \hyperlink{mpr}{ici})\\
+                Ils contiennent le status des liens d'un noeud avec tout son voisinage.
+            \item \textit{topology control (TC)}\\
+                Diffusés dans tous le réseau par les \textit{MPR}. Ils contiennt la liste de tous les \textit{MPRs}
+                du noeud qui émet ce paquet.
+        \end{enumerate}
+        \hypertarget{mpr}{\textit{\textbf{MPR}}}\\
+        Les multipoint relays sont des noeuds qui sont chargés d'effectuer le broadcasting des \textit{TCs}. \\
+        L'ensemble des \textit{MPRs} d'un réseau \textit{OLSR} forme un arbre couvrant du réseau. Trouver ce sous-ensemble de sommets
+        est un problème \textit{NP-Complet}. \textit{DSR} propose une heursitique simple pour calculer cet ensemble de \textit{MPRs}.\\
+        
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.5]{images/olsr.png}
+            \caption{Shéma d'un réseau OLSR}
+            \label{olsr}
+        \end{figure}
+
+        \textbf{Découverte de voisins}\\
+        La découverte de voisins se fait comme suit:
+        \begin{itemize}
+            \item Quand un noeud B reçoit un message \textit{hello} d'un noeud A,
+                il va rajouter A dans ses voisins avec le status \underline{asymétrique}
+            \item B va ensuite envoyer un message \textit{hello} avec A asymétrique dans la liste de voisins.
+            \item Quand a reçoit se message, il va pouvoir modifier le statut de B à symétrique.
+            \item A renvoie un message \textit{hello} avec B symétrique dans la liste des voisins.
+            \item Quand B reçoit ce message il modifie le statut de A à symétrique
+        \end{itemize}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.6]{images/olsr_neighborDiscovery.png}
+            \caption{découverte de voisins en utilisant les messages \textit{hello} \cite{olsr_neighborDiscovery_w}}
+            \label{olsr_neighborDiscovery}
+        \end{figure}
+    
+    \subsubsection{\underline{AODV}}%\underline{\textbf{AODV}}\\
         Ad-hoc On-demand Distance Vector (AODV) est un protocole réactif à vecteur de distance.\\
         Ce protocole définis 3 types de messages:
         \begin{enumerate}
@@ -518,18 +577,59 @@ Arnaud \textsc{Palgen}
 
         \underline{\textbf{Evitement de boucles}}\\
             A priori les numéros de séquences suffisent pour éviter les boucles. Cependant, d'après \cite{loop_aodv_w}, il y a des
-            albiguités dans le RFC \cite{aodv_w}. Certaines parties du RFC concerant la gestion des numéros de séquences pourraient introduire
-            des boucles. Nous approfondirons la lecture de cet article si nous choisissons ce protocole. Afin d'éviter les boucles dans notre implémentation.
+            ambiguités dans le RFC \cite{aodv_w}. Certaines parties du RFC concerant la gestion des numéros de séquences pourraient introduire
+            des boucles. Nous approfondirons la lecture de cet article si nous choisissons ce protocole afin d'éviter les boucles dans notre implémentation.
 
-    \underline{\textbf{DSR}}\\
+    \subsubsection{\underline{DSR}}%\underline{\textbf{DSR}}\\
         Comme \textit{AODV}, \textit{DSR} est un protocole réactif à vecteur de distance.\\
+        % ack lors de la reception d'un paquet
+        Deux mécanismes principaux caractérisent \textit{DSR}\\
+        \begin{enumerate}
+            \item \textbf{Route Discovery}\\
+                Similaire à la découverte de chemins dans AODV. La différence est que le \textit{RREQ} va contenit l'id de tous les sauts de chemin.\\
+                Quand la cible d'un \textit{RREQ} le reçoit, elle va répondre avec un \textit{RREP} contenant le chemin du \textit{RREQ} inversé.\\
+                Quand des paquets de données contiennent le chemin complet par lequel ils doivent transiter.\\
+                On a donc des paquets d'une taille variant avec celle du chemin emprunté.
+            \item \textbf{Route Maintenance}\\
+                Chaque noeud est résposables des liens entre lui et ses sucesseurs et possède une cache de routes.
+                Pour cela, quand un noeud reçoit un paquet, il va transmettre à la source de ce paquet
+                un ack. Si le ack n'est pas reçu au bout d'un temps fixé, l'émetteur du paquet va émettre
+                un paquet \textit{route\_error} à ses prédécesseurs pour leur signaler que le lien n'existe plus.\\
+                Si des routes sont interrompues, les noeuds peuvent soit utiliser d'autres routes de leur cache, soit initier une \textit{route discovery}
+
+        \end{enumerate}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.12]{images/ack_dsr.png}
+            \caption{Illustration de DSR \cite{dsr_for_adHoc_network}}
+            \label{dsr_image}
+        \end{figure}
+\chapter{Implémentation}
+\section{Limitations}
+        Le driver Wi-Fi d'\textit{IDF} ne nous permet pas d'avoir une connection
+        avec plusieurs noeud simultanément. \espnow\ pourraît être une solution
+        pour palier à ce problème.\\
+    
+    
+        \textbf{ESP NOW}\\
+            \espnow\ est un protocole de communication Wi-Fi sans connexion définis par Espressif.\\
+            Nous n'avons trouvé aucune documentation décivant le fonctionnement de ce protocole.\\
+            Avec la documentation disponible, nous savons qu'un noeud a une liste de \textit{peers} (ses voisins) avec qui il peut échanger des données.
+            Le nombre de voisins est limité à 20. Cette limite ne posera pas problème pour ce projet.
         
 
-\section{Limitations}
-        work in progress...
-
-    \subsection{ESP NOW}
-        work in progress...
+\section{Prochaines étapes}
+        \begin{enumerate}
+            \item Nous allons créer un réseau \espmesh. Ceci nous permettra de nous
+            familiariser avec l'environnement \textit{IDF}.
+            \item Nous évaluerons les performances et fonctionnalités de ce protocole.
+            \item Nous implémenterons un protocole de routage mesh choisis plus haut.
+            \item L'objectif est de l'implémenter au niveau de la couche liaison de données.
+                Si nous rencontrons trop de difficulté ou que nous jugeons que ce choix n'est pas judicieux,
+                nous implémenterons ce protocole au niveau de la couche réseau.
+            \item Nous évaluerons les performances et fonctionnalités du prorotype créé. 
+            
+        \end{enumerate}
 
 %\listoffigures
 \bibliography{biblio.bib}{}
