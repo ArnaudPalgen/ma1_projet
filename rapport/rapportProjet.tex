@@ -1,4 +1,5 @@
 \documentclass[a4paper, 12pt]{report}
+\usepackage[table, dvipsnames]{xcolor}
 \usepackage[utf8]{inputenc}
 \usepackage[french]{babel}
 \usepackage[pdftex]{graphicx}
@@ -13,7 +14,6 @@
 \usepackage{qtree}
 \usepackage{newfloat}
 \usepackage{moreverb}
-\usepackage{hyperref}
 \usepackage[T1]{fontenc}
 %\usepackage[dvips]{hyperref}
 \hypersetup{
@@ -48,14 +48,17 @@ linkcolor=red,
 % Title
 \HRule \\[0.3cm]
 { \LARGE \bfseries Réseau Wi-Fi multi-sauts sur plateforme ESP \\[0.3cm]}
-{ \LARGE \bfseries Rapport de projet \\[0.1cm]}
 \HRule \\[1.5cm]
 
 % Author and supervisor
 \begin{minipage}[t]{0.45\textwidth}
 \begin{flushleft} \large
 \emph{Directeur:}\\
-Bruno \textsc{Quoitin}
+Bruno \textsc{Quoitin}\\
+\vspace{1.2cm}
+\emph{Rapporteurs:}\\
+Alain \textsc{Buyse}\\
+Jeremy \textsc{Dubrulle}\\
 \end{flushleft}
 \end{minipage}
 \begin{minipage}[t]{0.45\textwidth}
@@ -82,12 +85,12 @@ Arnaud \textsc{Palgen}
 \end{titlepage}
 
 \chapter*{Introduction}
-    Un réseau wifi traditionnel (voir figure \ref{traditional-network-pic}) est composé
+    Un réseau \wifi\ traditionnel (voir Fig. \ref{traditional-network-pic}) est composé
     d'un noeud central, le point d'accès (AP) qui est
     directement connecté à tous les autres noeuds (stations) du réseau.
     L'AP a alors pour rôle d'acheminer les paquets d'une station à une autre
     mais aussi des paquets vers des adresses \textsc{ip} externe au réseau.
-    Un inconvénient de ces réseaux est qu'ils ont une portée limitée car chaque station
+    Un inconvénient de ces réseaux est qu'ils ont une couverture limitée car chaque station
     doit se trouver à portée de l'AP.\\
 
     \begin{figure}[H]
@@ -97,33 +100,36 @@ Arnaud \textsc{Palgen}
         \label{traditional-network-pic}
     \end{figure}
 
-    L'objectif de ce projet est de concevoir un réseau \mesh\ multi-sauts (voir figure \ref{mesh-network-pic})
+    L'objectif de ce projet est de concevoir un réseau \mesh\ multi-sauts (voir Fig. \ref{mesh-network-pic})
     \footnote{Notez que sur la figure, un seul noeud fait office d'interface
     entre le réseau \mesh\ et le réseaux \textsc{ip} externe. Ce n'est cependant pas toujours
-    le cas} qui n'a pas ce problème. Un réseau \mesh\ multi-sauts est un réseau où les noeuds
-    sont directements connectés entre eux. Chaque noeud doit ainsi acheminer
-    les paquets de ses voisins vers le noeud suivant pour que ce paquet atteigne
-    sa destination.\\
+    le cas} qui n'a pas ce problème. 
+    Un réseau \mesh\ multi-sauts est un réseau où tous les noeuds peuvent communiquer avec tous les
+    autres noeuds à la portée de leur radio. Chaque noeud peut ainsi acheminer
+    les paquets de données de ses voisins vers le noeud suivant et ainsi de suite, jusqu'à ce qu'ils
+    atteigent leurs destinations. Les chemins utilisés pour acheminer les paquets sont obtenus à l'aide
+    d'un protocole de routage.\\
 
     \begin{figure}[H]
         \centering
         \includegraphics[scale=0.4]{images/mesh-esp-mesh-network-architecture.png}
-        \caption{Réseau \wifi\ traditionnel \cite{esp-mesh_w}}
+        \caption{Réseau \mesh\ \cite{esp-mesh_w}}
         \label{mesh-network-pic}
     \end{figure}
 
     
-
-    Le microcontrôleur \esp\ d'Espressif sera utilisé en raison de son très faible coût.\\
+    Pour ce projet, les noeuds du réseau \mesh\ seront des microcontrôleurs \wifi. 
+    L'\esp\ d'Espressif sera utilisé en raison de son très faible coût et
+    ses outils pemettant d'obtenir une consommation électrique ultra-faible.\\
 
     Dans un premier temps, nous devrons choisir un protocole adapté à ce type
     de réseau et à l'\esp. En effet, il existe une multitude de protocoles
     \mesh\ dans la littérature scientifique.\\
 
-    Une fois choisis, nous implémenterons ce protocole pour créer un
+    Une fois choisi, nous implémenterons ce protocole pour créer un
     réseau fonctionnel. Le réseau ainsi créé sera testé pour en évaluer sa performance et ses fonctionnalités.\\
 
-    Enfin, nous nous attarderons sur l'économie d'énegie du microcontrôleur pour
+    Enfin, nous nous attarderons sur l'économie d'énergie du microcontrôleur pour
     que notre réseau puisse être alimenté par batterie.
     %L'objectif du projet est de concevoir un réseau \wifi\ multi-sauts composé 
     %de micro-contrôleurs \wifi. L'\esp\ d'Espressif sera utilisé en raison de 
