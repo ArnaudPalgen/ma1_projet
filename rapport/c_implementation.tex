@@ -1,0 +1,33 @@
+\chapter{Implémentation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Limitations}
+        Le driver Wi-Fi d'\textit{IDF} ne nous permet pas d'avoir une connexion
+        avec plusieurs noeuds simultanément. \espnow\ pourraît être une solution
+        pour palier à ce problème.\\
+    
+    
+        \textbf{ESP NOW}\\
+            \espnow\ est un protocole de communication Wi-Fi sans connexion défini
+            par Espressif.\\ Nous n'avons trouvé aucune documentation décrivant le
+            fonctionnement de ce protocole.\\
+            Avec la documentation disponible, nous savons qu'un noeud a une liste
+            de \textit{peers} (ses voisins) avec qui il peut échanger des données.
+            Le nombre de voisins est limité à 20. Cette limite ne posera pas 
+            problème pour ce projet.
+        
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Prochaines étapes}
+        \begin{enumerate}
+            \item Nous allons créer un réseau \espmesh. Ceci nous permettra de nous
+            familiariser avec l'environnement \textit{IDF}.
+            \item Nous évaluerons les performances et fonctionnalités de ce protocole.
+            \item Nous implémenterons un protocole de routage mesh choisis plus haut.
+            \item L'objectif est de l'implémenter au niveau de la couche liaison de données.
+                Si nous rencontrons trop de difficulté ou que nous jugeons que ce 
+                choix n'est pas judicieux, nous implémenterons ce protocole au niveau 
+                de la couche réseau.
+            \item Nous étudierons les différentes possibilités d'économies d'énergie
+            \item Nous évaluerons les performances et fonctionnalités du prorotype créé. 
+            
+        \end{enumerate}

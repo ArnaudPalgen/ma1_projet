@@ -1,0 +1,266 @@
+\chapter{Etat de l'Art}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Présentation de l'ESP}
+    \textbf{Aperçu}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.3]{images/esp32-devkitc.jpg}
+        \caption{ESP32-DevKitC V4 with ESP32-WROOM-32 module
+            \cite{esp32-gettingStarted_w}}
+        \label{esp32_img}
+    \end{figure}
+    Comme dit plus haut, les noeuds de notre réseau seront des \esp.
+    Pour ce projet, nous utilisons un kit de développement (Fig. \ref{esp32_img}) équipé d'un
+    \esp\textsc{-wroom32}, développé par Espressif. L'\esp\textsc{-wroom32}
+    un System-on-Chip (SoC), c'est à dire un circuit intégré rassemblant plusieurs
+    composants comme des entrées/sorties, de la mémoire \textsc{ram}, micorprocesseurs,
+    microcontrôleurs, etc.
+    %todo prix
+    Il a été choisis pour son faible coût et sa conception adaptée à l'Internet des Objets (IoT). 
+    En effet, en plus de supporter le \wifi\ et le Bluetooth 2.4GHz,
+    sa consommation en énergie est faible et il possède des mécanismes permettant de l'économiser. %et il possède plusieurs modes de fonctionnement.
+    %permettant de la réduire (voir Table \ref{Consumption_PowerModes}).
+    La table \ref{spec} fournit ses spécifications.
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|}
+            \hline
+            \rowcolor{lightgray}
+            Element & Spécification\\ \hline
+            WiFi & 802.11 b/g/n (802.11n jusqu'à 150 Mbps)\\ \hline
+            Bluetooth & Bluetooth v4.2 BR/EDR and BLE specification\\ \hline
+            CPU & 2 micorprocesseurs Xtensa \up{\tiny{\textregistered}} 32-bit LX6\\ \hline
+            Interfaces & \makecell{SD card, UART, SPI, SDIO, I2C, LED PWM, Motor PWM, I2S,IR, \\
+                pulse counter, GPIO, capacitive touch sensor, ADC, DAC}\\ \hline
+            \makecell{Tension de \\fonctionnement} & $3.0V \sim 3.6V$\\ \hline
+        \end{tabular}
+        \caption{Spécification de l'\esp\textsc{-wroom32} \cite{esp32WROOM_datasheet}}
+        \label{spec}
+    \end{table}
+    \textbf{Schéma-bloc}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.15]{images/esp32-blockDiagram.png}
+        \caption{Schéma-bloc \cite{esp32_datasheet}}
+        %\label{}
+    \end{figure}
+
+    \textbf{Mémoire}\cite{esp32WROOM_datasheet}\\
+        La mémoire interne inclut:
+        \begin{itemize}
+            \item 448 KB de ROM pour le démarrage et les fonctionsd de base
+            \item 520 KB de SRAM pour les données et les instructions
+        \end{itemize}
+        L'\esp\ prend aussi en charge de la mémoire externe.\\
+    
+    
+        \textbf{Gestion de l'énergie}\\
+        Comme dit plus haut, l'\esp\ a une consommation d'énergie faible. De plus il possède plusieurs
+        modes de fonctionnement repris dans la Table \ref{Consumption_PowerModes} permettant de
+        la diminuer.
+    
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|l|}
+            \hline
+            \rowcolor{lightgray}
+            Power mode & Description & Power consumption\\\hline
+            Active & radio and CPU are on  & 95mA $\sim$ 240 mA\\ \hline
+            Modem-sleep & radio is off, CPU is on at 80MHz & 20mA $\sim$ 31mA\\ \hline
+            Light-sleep & \makecell{CPU is paused, RTC memory and \\peripherals are running.\\
+            Any wake-up events like \mac\ events will \\wake
+            up the chip.} & 0.8mA\\ \hline
+            Deep-sleep & RTC memory and RTC peripherals are powered on & $10\mu A\sim 150\mu A$\\ \hline
+            Hibernation & RTC timer only & $5\mu A$\\ \hline
+            Power off & - & $0.1 \mu A$\\ \hline
+        \end{tabular}
+        \caption{Consommation par mode \cite{esp32_datasheet}}
+        \label{Consumption_PowerModes}
+        
+    \end{table}
+
+
+
+
+
+    %L'\esp\ est un système embarqué développé par Espressif et dédié à l'internet
+    %des objets.\\
+    %Il est compatible WiFi et Bluetooth 2.4 GHz. Il a une consommation faible
+    %en énergie et des mécanismes d'économies d'énergie.\\
+    %Il est équipé de 34 pins GPIOs, d'un CPU Xtensa \up{\tiny{\textregistered}}
+    %single-/dual-core 32-bit LX6
+    %\begin{figure}[H]
+    %    \centering
+    %    \includegraphics[scale=0.4]{images/esp32-devkitc.jpg}
+    %    \caption{ESP32-DevKitC V4 with ESP32-WROOM-32 module
+    %        \cite{esp32-gettingStarted_w}}
+    %    \label{esp32_img}
+    %\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Environnement de développement}
+    Trois environnements s'offrent à nous:
+    \begin{enumerate}
+        \item \textbf{MicroPython}\\
+            Selon le site officiel de MicroPython\cite{micropython_w}, MicroPython
+            est une implémentation simple et efficace de Python 3 incluant un
+            petit sous-ensemble de la bibliothèque standard Python et est
+            optimisé pour fonctionner sur des microcontrôleurs.\\
+            MicroPython est open source et facile à utiliser. Cependant,
+            il n'est pas assez bas niveau pour ce projet.\\
+            Par exemple il serait impossible d'envoyer des paquets au niveau de la
+            couche lisaison de données ou encore, avoir accès aux tables de routages \textsc{ip}.\\
+        
+        \item \textbf{IoT Development Framework (IDF)}\\
+            IDF est l'environnement du constucteur de l'\esp\ (Espressif).
+            La documentation est complète mais le code source n'est pas entièrement
+            disponible. Pour certaines parties du framework, nous n'avons accès qu'aux
+            fichiers d'entête.\\
+            Ce framework est natif et nous apportera donc une plus grande fidélité à l'\esp. \\
+            Cet environnement nous donne aussi accès à des fonctionnalités de FreeRTOS
+            (free real-time operating system).\\
+            FreeRTOS est un système d'exploitation temps réel open source pour microcontrôleurs.
+            Ses fonctionnalités pourront nous être utiles pour le projet.\\
+
+        \item \textbf{Arduino}\\
+            L'environnement Arduino se base sur IDF. Il est donc possible que certaines
+            fonctionnalités d'IDF ne soient pas disponible. 
+            La documentation est moins complète qu'IDF mais tout le code source est disponible.
+            Cet environnement semble assez bas niveau car nous avons accès au driver Ethernet
+            et à la couche \textsc{ip}.
+    \end{enumerate}
+    \vspace{1cm}
+    Il est évident que nous ne choisirons pas MicroPython car certaines fonctionnalités utiles
+    pour ce projet ne sont pas accessibles.\\
+    Nous choisirons IDF pour sa documentation complète, sa nativité et l'accès aux
+    fonctionnalités de FreeRTOS.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Protocoles de routage}
+    Dans cette section, nous discutons des différents protocoles de routage envisageables.\\
+    Nous allons d'abord établir un classement des protocoles de routage \mesh.\\
+    Ensuite nous allons décrire brièvement les protocoles les plus cités dans la littérature pour les classer
+    en fonction de leur appartenance à une catégorie établie dans notre classement. 
+    Enfin, nous pourrons choisir un protocole à implémenter pour ce projet.\\
+
+    \underline{\textbf{Classification}}\\
+
+    Les protocoles de routages \mesh\ peuvent être divisés en deux grandes catégories:
+    \begin{enumerate}
+        \item \textbf{Proactifs}: Les noeuds maintiennent une/des table(s) de routage
+            qui stockent les routes vers tous les noeuds du réseau. 
+            Ils envoient régulièrement des paquets de contrôle à travers le réseau pour échanger et 
+            mettre à jour l'information de leurs voisins.
+        \item \textbf{Réactifs}: Ces protocoles établissent une route uniquement quand des paquets
+            doivent être transférés.
+    \end{enumerate}
+    Nous écarterons les protocoles proactifs pour ce projet car ils gardent
+    beaucoup d'information en mémoire. Ils ne passent donc pas à l'échelle.\\
+    Les protocoles réactifs sont plus économes en ressources mais nécessitent parfois un délai
+    plus long pour établir une route
+    car elles sont établies à la demande.\\
+
+    \underline{\textbf{Description}}\\
+
+    Il existe une multitude de protocols de routage \mesh.
+    Ci-dessous, en voici quelques-uns souvent cités dans la littérature:\\
+    \begin{itemize}
+        \item \textbf{AODV}\cite{aodv_w} Ad-hoc On-demand Distance Vector\\
+            Protocole réactif à vecteur de distance que nous décrirons en détail par la suite.\\
+        \item \textbf{DSR}\cite{dsr_w} Dynamic Source Routing\\
+            Similaire à AODV mais ici, les paquets servant à la découverte d'un chemin
+            (\textit{RREQ}) contiennent tous les sauts de ce chemin.\\
+        \item \textbf{OLSR}\cite{olsr_w} Optimized Link State Routing\\
+            Protocole proactif à état de liens. Dans ce protocole, certains noeuds servent de relais pour effectuer
+            le broadcasting des paquets servant à la découverte de chemins. L'ensemble de ces noeuds forme un arbre couvrant du réseau.\\
+        \item \textbf{B.A.T.M.A.N}\cite{batman_w} Better Approach to Mobile Adhoc Networking\\
+            Protocole proactif à état de liens. Le protocole ne calcule
+            pas le chemin pour atteindre un noeud mais le meilleur saut dans la bonne direction.
+            Pour cela, pour chaque destination il va sélectionner son voisin qui lui a transmis
+            le plus de messages de cette destination.\\
+        \item \textbf{DSDV}\cite{dsdv_w} Destination Sequence Distance Vector\\
+            Protocole à vecteur de distance basé sur l'algorithme de Bellman-Ford.
+    \end{itemize}
+
+    Nous pouvons donc classer ces protocoles de la manière suivante: 
+    \begin{diagram}[H]
+        \Tree[.{wireless network protocols} 
+            [.Reactive [.\textsc{aodv} ]
+                [.\textsc{dsr} ]]
+            [.Proactive [.{Link-state} 
+                [.\textsc{olsr} ] 
+                [.\textsc{b.a.t.m.a.n} ]] 
+                [.{Distance-vector} [.\textsc{dsdv} ]]]]
+        \caption{Classifications des protocols de routage }
+    \end{diagram}
+
+    \underline{\textbf{Choix d'un protocole}}\\
+
+    Comme dit plus haut, nous écartons les protocoles proactifs. Il nous reste donc le choix entre \aodv\ et \textsc{dsr}.
+    Nous allons retenir \aodv\ pour la taille fixe de ses paquets. En effet, \textsc{dsr} utilise plus de données quand
+    les routes contiennent un grand nombre de sauts.
+
+    
+    
+%    Dans cette section nous discutons de différents protocoles de routage envisageables.\\
+%    Tout d'abord, nous établirons un classement des différents types de protocoles de routage\mesh. \\
+%    Ensuite, nous etudierons et comparerons différents protocoles de routage mesh: \espmesh\
+%    \cite{esp-mesh_w}, OLSR\cite{olsr_w}, AODV\cite{aodv_w} et DSR\cite{dsr_w}\\
+%    Enfin nous allons choisir un protocole à implémenter sur \esp.\\
+%    
+%    \subsection{Classification}
+%    Les protocoles de routages \mesh\ peuvent être divisés en deux grandes catégories:
+%    \begin{enumerate}
+%        \item \textbf{Proactifs}: Les noeuds maintiennent une/des table(s) de routage
+%            qui stockent les routes vers tous les noeuds du réseau. 
+%            Ils envoient régulièrement des paquets de contrôle à travers le réseau pour échanger et 
+%            mettre à jour l'information de leurs voisins.
+%        \item \textbf{Réactifs}: Ces protocoles établissent une route uniquement quand des paquets
+%            doivent être transférés.
+%    \end{enumerate}
+%    Nous écarterons les protocoles proactifs pour ce projet car ils gardent
+%    beaucoup d'information en mémoire. Ils ne passent donc pas à l'échelle.\\
+%    Les protocoles réactifs sont plus économes en ressources mais nécessitent parfois un délai
+%    plus long pour établir une route
+%    car elles sont établies à la demande.\\
+%    
+%    Il existe une multitude de protocols de routage \mesh. 
+%    Ci-dessous, en voici quelques-uns souvent cités dans la littérature:\\
+%    \begin{itemize}
+%        \item \textbf{AODV}\cite{aodv_w} Ad-hoc On-demand Distance Vector\\
+%            Protocole réactif à vecteur de distance que nous décrirons en détail par la suite.\\
+%        \item \textbf{DSR}\cite{dsr_w} Dynamic Source Routing\\
+%            Similaire à AODV mais ici, les paquets servant à la découverte d'un chemin
+%            (\textit{RREQ}) contiennent tous les sauts de ce chemin.\\
+%        \item \textbf{OLSR}\cite{olsr_w} Optimized Link State Routing\\
+%            Protocole proactif à état de liens. Dans ce protocole, certains noeuds servent de relais pour effectuer
+%            le broadcasting des paquets servant à la découverte de chemins. L'ensemble de ces noeuds forme un arbre couvrant du réseau.\\
+%        \item \textbf{B.A.T.M.A.N}\cite{batman_w} Better Approach to Mobile Adhoc Networking\\
+%            Protocole proactif à état de liens. Le protocole ne calcule
+%            pas le chemin pour atteindre un noeud mais le meilleur saut dans la bonne direction.
+%            Pour cela, pour chaque destination il va sélectionner son voisin qui lui a transmis
+%            le plus de messages de cette destination.\\
+%        \item \textbf{DSDV}\cite{dsdv_w} Destination Sequence Distance Vector\\
+%            Protocole à vecteur de distance basé sur l'algorithme de Bellman-Ford.
+%    \end{itemize}
+%    On peut donc classer ces protocoles de la manière suivante: 
+%    \begin{diagram}[H]
+%        \Tree[.{wireless network protocols} 
+%            [.Reactive [.\textsc{aodv} ]
+%                [.\textsc{dsr} ]]
+%            [.Proactive [.{Link-state} 
+%                [.\textsc{olsr} ] 
+%                [.\textsc{b.a.t.m.a.n} ]] 
+%                [.{Distance-vector} [.\textsc{dsdv} ]]]]
+%        \caption{Classifications des protocols de routage }
+%    \end{diagram}
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\input{s_espMesh.tex}    
+%    \vspace{1cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%\newpage 
+%\input{s_aodv.tex}
