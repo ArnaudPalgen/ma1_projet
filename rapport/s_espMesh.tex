@@ -3,9 +3,9 @@
         Cette section explique le fonctionnement de ce protocole. \espmesh\ a pour objectif la création d'un arbre recouvrant.
         Il existe plusieurs types de noeuds:
         \begin{enumerate}
-            \item \textbf{Racine}: Seule interface entre le réseau \espmesh\ et un réseau \textsc{ip} externe.
-            \item \textbf{Noeuds intermédiaires}: Noeuds qui ont un parent et au moins un enfant.
-            Ils transmettre leurs paquets et ceux de leurs enfants.
+            \item \textbf{Racine}: seule interface entre le réseau \espmesh\ et un réseau \textsc{ip} externe.
+            \item \textbf{Noeuds intermédiaires}: noeuds qui ont un parent et au moins un enfant.
+            Ils transmettent leurs paquets et ceux de leurs enfants.
             \item \textbf{Feuilles}: noeuds qui n'ont pas d'enfants et ne transmettent que leurs paquets.
             \item \textbf{Noeuds idle}: noeuds qui n'ont pas encore rejoint un réseau \espmesh.
         \end{enumerate}
@@ -21,7 +21,7 @@
             \item Table de routage\\
                 Chaque noeud possède sa table de routage. Soit $p$ un noeud, sa table de routage contient les adresses \mac\ 
                 des noeuds du sous-arbre ayant $p$ comme racine, et également celle de $p$.\\
-                Elle est partitionnée en sous-tables qui correspondent au sous-arbres des enfants de $p$.
+                Elle est partitionnée en sous-tables qui correspondent aux sous-arbres des enfants de $p$.
             \item Acheminement de paquets\\
                 Quand un paquet est reçu,
                 \begin{itemize}
