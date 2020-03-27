@@ -1,7 +1,7 @@
 # Réseau Wi-Fi multi-sauts sur platforme ESP
 
-*Auteur*: **Arnaud Palgen**
-*Directeur*: **Bruno Quoitin**
+*Auteur*: **Arnaud Palgen**<br />
+*Directeur*: **Bruno Quoitin**<br />
 *Rapporteurs*: **Alain Buys**, **Jeremy Dubrulle**
 
 ---
@@ -20,7 +20,7 @@ Le [rapport de projet](./rapport/out/rapportProjet.pdf) décrit ces étapes en d
 
 ## Outils utilisés
 - Visual Studio Code
-- Wireshark: utilisé avec l'interfac Wi-Fi Edimax pour écouter le traffic Wi-Fi du réseau MESH.
+- Wireshark: utilisé avec l'interfac Wi-Fi Edimax pour écouter le traffic Wi-Fi du réseau MESH.<br />
 Paramètrage de l'interface en mode *monitor*:
 ```console
 user@computer:~$ iwconfig <interface_name>
