@@ -159,7 +159,7 @@ void app_main(void){
     ESP_ERROR_CHECK(esp_event_handler_register(MESH_EVENT, ESP_EVENT_ANY_ID, &mesh_event_handler, NULL));
 
     /* Enable the Mesh IE encryption by default */
-    mesh_cfg_t cfg = MESH_INIT_CONFIG_DEFAULT();
+    mesh_cfg_t cfg = MESH_INIT_CONFIG_DEFAULT(); // voir dans fichier header
     
     /* mesh ID */
     memcpy((uint8_t *) &cfg.mesh_id, MESH_ID, 6);
@@ -176,9 +176,15 @@ void app_main(void){
     /* mesh softAP */
     cfg.mesh_ap.max_connection = 4;
     memcpy((uint8_t *) &cfg.mesh_ap.password, "toto",
-           strlen("toto"));
+           strlen("toto"));//essayer de mettre null
     cfg.allow_channel_switch=true;
-    cfg.crypto_funcs = NULL;
+    cfg.crypto_funcs = NULL; // peut etre payload qui est crypte 
+    //regarder la version
+    //essayer avec interface de mon pc renseigner sur dongle
+    //connecter un deboger a openocd comme gdb
+    //esp now
+    //a donner: setup adapater wifi avec son modele, schema de cablage
+
     
     ESP_ERROR_CHECK(esp_mesh_set_config(&cfg));
     ESP_ERROR_CHECK(esp_mesh_start());
@@ -207,5 +213,4 @@ print "message:", MESSAGE
    
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
-
 */
