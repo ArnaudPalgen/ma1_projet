@@ -85,11 +85,11 @@ void app_main(void){
         memcpy(peer.peer_addr, peer_addrA, ESP_NOW_ETH_ALEN);
         ESP_ERROR_CHECK(esp_now_add_peer(&peer));
         esp_now_send(&peer_addrA, &data, sizeof(data));
-    }else{
+    }/*else{
         ESP_LOGI(TAG, "send to b");
         memcpy(peer.peer_addr, peer_addrB, ESP_NOW_ETH_ALEN);
         ESP_ERROR_CHECK(esp_now_add_peer(&peer));
         esp_now_send(&peer_addrB, &data, sizeof(data));
-    }
+    }*/
 
 }
