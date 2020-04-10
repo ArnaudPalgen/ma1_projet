@@ -1,0 +1,266 @@
+dev/ttyUSB1
+Checking Python dependencies...
+Python requirements from /home/arnaud/esp/esp-idf/requirements.txt are satisfied.
+Running idf_monitor in directory /home/arnaud/Dropbox/Cours2019-2020/projet/projet_ma1/code/internal_communication
+Executing "/usr/bin/python /home/arnaud/esp/esp-idf/tools/idf_monitor.py -p /dev/ttyUSB1 -b 115200 /home/arnaud/Dropbox/Cours2019-2020/projet/projet_ma1/code/internal_communication/build/internal_communication.elf -m '/usr/bin/python' '/home/arnaud/esp/esp-idf/tools/idf.py' '-p' '/dev/ttyUSB1'"...
+--- idf_monitor on /dev/ttyUSB1 115200 ---
+--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
+e�.R��  �20L��:2���SH���.��x1�	�]ER��%U�ETJI��t:��3�i�}MT_�*M!�BO��j
+co�V��ip:�,�*�]�:0��5
+cl�E��i0x�,qE��i0x�b"}dr�'��0,c����v:��0��}�rv:�����}�rv'��0
+틕�DIO	��ck�V��2
+�녑:0x&��A01㉕�:67M�끰���l �&���m S�l+��0x4���0,���120���
+                                                          �ta�
+                                                               ���ro�
+                                                                     �j
+l�X���0�0��bb�n:��j
+e����0x4�80�j
+[���j%��S	���: C+
+                        �Rev����K��[0�C��ښ��%�(75����_c��� ch��rYWk�on��bj��� bo����de���p rYWk�on����I (42) boot: ESP-IDF v3.3.1 2nd stage bootloader
+I (42) boot: compile time 10:38:23
+I (42) boot: Enabling RNG early entropy source...
+I (47) boot: SPI Speed      : 40MHz
+I (51) boot: SPI Mode       : DIO
+I (55) boot: SPI Flash Size : 2MB
+I (59) boot: Partition Table:
+I (62) boot: ## Label            Usage          Type ST Offset   Length
+I (70) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (77) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (85) boot:  2 factory          factory app      00 00 00010000 00100000
+I (92) boot: End of partition table
+I (96) boot_comm: chip revision: 1, min. application chip revision: 0
+I (103) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x21fe0 (139232) map
+I (161) esp_image: segment 1: paddr=0x00032008 vaddr=0x3ffb0000 size=0x030f4 ( 12532) load
+I (167) esp_image: segment 2: paddr=0x00035104 vaddr=0x40080000 size=0x00400 (  1024) load
+0x40080000: _WindowOverflow4 at /home/arnaud/esp/esp-idf/components/freertos/xtensa_vectors.S:1779
+
+I (168) esp_image: segment 3: paddr=0x0003550c vaddr=0x40080400 size=0x0ab04 ( 43780) load
+I (195) esp_image: segment 4: paddr=0x00040018 vaddr=0x400d0018 size=0x90ca4 (593060) map
+0x400d0018: _stext at ??:?
+
+I (404) esp_image: segment 5: paddr=0x000d0cc4 vaddr=0x4008af04 size=0x04f10 ( 20240) load
+0x4008af04: rtc_clk_32k_enable at /home/arnaud/esp/esp-idf/components/soc/esp32/rtc_clk.c:517
+
+I (422) boot: Loaded app from partition at offset 0x10000
+I (422) boot: Disabling RNG early entropy source...
+I (422) cpu_start: Pro cpu up.
+I (426) cpu_start: Application information:
+I (431) cpu_start: Project name:     esp-idf
+I (436) cpu_start: App version:      41e50e9
+I (441) cpu_start: Compile time:     Apr  5 2020 10:38:17
+I (447) cpu_start: ELF file SHA256:  a601c70fd72ba8df...
+I (453) cpu_start: ESP-IDF:          v3.3.1
+I (458) cpu_start: Starting app cpu, entry point is 0x400810f8
+0x400810f8: call_start_cpu1 at /home/arnaud/esp/esp-idf/components/esp32/cpu_start.c:269
+
+I (0) cpu_start: App cpu up.
+I (468) heap_init: Initializing. RAM available for dynamic allocation:
+I (475) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (481) heap_init: At 3FFB9EC0 len 00026140 (152 KiB): DRAM
+I (487) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (494) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (500) heap_init: At 4008FE14 len 000101EC (64 KiB): IRAM
+I (506) cpu_start: Pro cpu start user code
+I (189) cpu_start: Starting scheduler on PRO CPU.
+I (0) cpu_start: Starting scheduler on APP CPU.
+I (270) wifi: wifi driver task: 3ffc1b00, prio:23, stack:3584, core=0
+I (270) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (270) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (310) wifi: wifi firmware version: ac331d7
+I (310) wifi: config NVS flash: enabled
+I (310) wifi: config nano formating: disabled
+I (310) wifi: Init dynamic tx buffer num: 32
+I (310) wifi: Init data frame dynamic rx buffer num: 32
+I (310) wifi: Init management frame dynamic rx buffer num: 32
+I (320) wifi: Init management short buffer num: 32
+I (320) wifi: Init static rx buffer size: 1600
+I (330) wifi: Init static rx buffer num: 10
+I (330) wifi: Init dynamic rx buffer num: 32
+I (430) phy: phy_version: 4102, 2fa7a43, Jul 15 2019, 13:06:06, 0, 0
+I (430) wifi: mode : sta (3c:71:bf:0d:7e:18) + softAP (3c:71:bf:0d:7e:19)
+I (430) wifi: Total power save buffer number: 16
+I (440) wifi: Init max length of beacon: 752/752
+I (440) wifi: Init max length of beacon: 752/752
+W (450) wifi: [beacon]interval:100ms
+I (450) mesh: <nvs>read layer:0
+I (450) mesh: <nvs>read assoc:0
+I (1450) wifi: Set ps type: 0
+
+I (1450) wifi: mode : sta (3c:71:bf:0d:7e:18)
+I (1460) mesh: <MESH_NWK_LOOK_FOR_NETWORK>need_scan:0x1, need_scan_router:0x0, look_for_nwk_count:1
+I (1460) mesh_main: <MESH_EVENT_STARTED>ID:77:77:77:77:77:77
+I (1460) mesh_main: mesh starts successfully, heap:185952, root not fixed
+
+I (1760) mesh: [S1]raspberryWIFI, b8:27:eb:22:ef:da, channel:7, rssi:-65
+I (1760) mesh: find router:[ssid_len:13]raspberryWIFI, rssi:-65, b8:27:eb:22:ef:da(encrypted), new channel:7, old channel:0
+I (1770) mesh: [FIND][ch:7]AP:1, otherID:0, MAP:0, idle:0, candidate:0, root:0[b8:27:eb:22:ef:da]router found
+I (1770) mesh: [FIND:1]find a network, channel:7, cfg<channel:7, router:raspberryWIFI, 00:00:00:00:00:00>
+
+I (1780) mesh_main: <MESH_EVENT_FIND_NETWORK>new channel:7, router BSSID:00:00:00:00:00:00
+I (1790) wifi: mode : sta (3c:71:bf:0d:7e:18) + softAP (3c:71:bf:0d:7e:19)
+W (1800) wifi: <MESH AP>adjust channel:7, secondary channel offset:1(40U)
+I (1810) wifi: Total power save buffer number: 16
+I (2110) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:0][b8:27:eb:22:ef:da]router found<>
+I (2120) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:1d,-120]
+I (2120) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:1d,-120]
+I (2130) mesh: 1250, vote myself, router rssi:-66 > voted rc_rssi:-120
+I (2140) mesh: [SCAN:1/10]rc[128][3c:71:bf:0d:7e:19,-66], self[3c:71:bf:0d:7e:18,-66,reason:0,votes:1,idle][mine:1,voter:1(1.00)percent:0.90][128,1,3c:71:bf:0d:7e:19]
+
+I (2450) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (2460) mesh: [SCAN:2/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-67,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,1,3c:71:bf:0d:7e:1d]
+
+I (2770) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (2780) mesh: [SCAN:3/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-66,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,1,3c:71:bf:0d:7e:1d]
+
+I (3090) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (3090) mesh: [SCAN:4/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-63,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,2,3c:71:bf:0d:7e:1d]
+
+I (3410) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (3410) mesh: [SCAN:5/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-67,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,2,3c:71:bf:0d:7e:1d]
+
+I (3730) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (3730) mesh: [SCAN:6/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-62,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,2,3c:71:bf:0d:7e:1d]
+
+I (4050) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (4050) mesh: [SCAN:7/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-57,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,2,3c:71:bf:0d:7e:1d]
+
+I (4370) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (4370) mesh: [SCAN:8/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-56,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,2,3c:71:bf:0d:7e:1d]
+
+I (4690) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (4690) mesh: [SCAN:9/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-58,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,2,3c:71:bf:0d:7e:1d]
+
+I (5010) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (5010) mesh: [SCAN:10/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-58,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,2,3c:71:bf:0d:7e:1d]
+
+I (5330) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (5330) mesh: [SCAN:11/10]rc[127][3c:71:bf:0d:7e:1d,-66], self[3c:71:bf:0d:7e:18,-60,reason:0,votes:0,idle][mine:0,voter:2(0.00)percent:0.90][127,2,3c:71:bf:0d:7e:1d]
+
+I (5650) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:0,i:1][b8:27:eb:22:ef:da]router found<>
+I (5650) mesh: 1250, vote myself, router rssi:-61 > voted rc_rssi:-66
+I (5660) mesh: [SCAN:12/10]rc[128][3c:71:bf:0d:7e:19,-66], self[3c:71:bf:0d:7e:18,-61,reason:0,votes:1,idle][mine:1,voter:2(0.50)percent:0.90][128,1,3c:71:bf:0d:7e:19]
+
+I (5970) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:0, candidate:1, root:1, topMAP:0[c:0,i:0][b8:27:eb:22:ef:da]router found<>
+I (5970) mesh: 6563[selection]try rssi_threshold:-78, backoff times:0, max:5<-78,-82,-85>
+I (5980) mesh: [DONE]connect to parent:ESPM_0D7E1C, channel:7, rssi:-52, 3c:71:bf:0d:7e:1d[layer:1, assoc:0], my_vote_num:0/voter_num:0, rc[00:00:00:00:00:00/-66/0]
+I (6000) mesh: set router bssid:b8:27:eb:22:ef:da
+I (7500) wifi: new:<7,1>, old:<7,1>, ap:<7,1>, sta:<7,1>, prof:7
+I (7500) wifi: state: init -> auth (b0)
+I (7510) wifi: state: auth -> assoc (0)
+I (7520) wifi: state: assoc -> run (10)
+I (7520) wifi: connected with ESPM_0D7E1C, aid = 1, channel 7, 40U, bssid = 3c:71:bf:0d:7e:1d
+I (7520) wifi: security type: 0, phy: bgn, rssi: -52
+I (7530) wifi: pm start, type: 0
+
+E (7530) event: invalid static ip
+I (7530) mesh: [scan]new scanning time:600ms
+W (7530) wifi: [beacon]new interval:300ms
+I (7540) mesh: 1891<arm>parent monitor, my layer:2(cap:25)(node), interval:10414ms, retries:1<normal connected>
+I (7550) mesh_main: <MESH_EVENT_PARENT_CONNECTED>layer:0-->2, parent:3c:71:bf:0d:7e:1d<layer2>, ID:77:77:77:77:77:77
+I (7560) mesh_main: <MESH_EVENT_TODS_REACHABLE>state:0
+---->is child -> don't listen
+I (7560) mesh_main: <MESH_EVENT_ROOT_ADDRESS>root address:3c:71:bf:0d:7e:1d
+----> count = 1
+I (7630) wifi: AP's beacon interval = 307200 us, DTIM period = 2
+----> count = 2
+----> count = 3
+----> count = 4
+----> count = 5
+----> count = 6
+----> count = 7
+----> count = 8
+----> count = 9
+----> count = 10
+----> count = 11
+----> count = 12
+----> count = 13
+----> count = 14
+----> count = 15
+----> count = 16
+----> count = 17
+----> count = 18
+----> count = 19
+----> count = 20
+----> count = 21
+I (18210) mesh: 4433<active>parent layer:1(node), channel:7, rssi:-47, assoc:0(cnx rssi threshold:-120)my_assoc:0
+----> count = 22
+----> count = 23
+----> count = 24
+I (19720) mesh: 5177<scan>parent layer:1, rssi:-49, assoc:1(cnx rssi threshold:-120)
+I (19720) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:0, candidate:1, root:1, topMAP:0[c:2,i:2][b8:27:eb:22:ef:da]<weak>
+I (19730) mesh: 6563[weak]try rssi_threshold:-120, backoff times:0, max:5<-78,-82,-85>
+I (19730) mesh: 616[monitor]no change, parent:3c:71:bf:0d:7e:1d, rssi:-49
+I (19740) mesh: 1891<arm>parent monitor, my layer:2(cap:25)(node), interval:5821ms, retries:2<>
+----> count = 25
+----> count = 26
+----> count = 27
+----> count = 28
+----> count = 29
+----> count = 30
+----> count = 31
+----> count = 32
+----> count = 33
+----> count = 34
+----> count = 35
+----> count = 36
+I (25710) mesh: 4433<active>parent layer:1(node), channel:7, rssi:-47, assoc:1(cnx rssi threshold:-120)my_assoc:0
+----> count = 37
+----> count = 38
+----> count = 39
+I (27210) mesh: 5177<scan>parent layer:1, rssi:-67, assoc:1(cnx rssi threshold:-120)
+I (27220) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:0, candidate:1, root:1, topMAP:0[c:0,i:2][b8:27:eb:22:ef:da]<weak>
+I (27220) mesh: 6563[weak]try rssi_threshold:-120, backoff times:0, max:5<-78,-82,-85>
+I (27230) mesh: 616[monitor]no change, parent:3c:71:bf:0d:7e:1d, rssi:-67
+I (27240) mesh: 1891<arm>parent monitor, my layer:2(cap:25)(node), interval:7420ms, retries:3<>
+----> count = 40
+----> count = 41
+----> count = 42
+----> count = 43
+----> count = 44
+----> count = 45
+----> count = 46
+----> count = 47
+----> count = 48
+----> count = 49
+----> count = 50
+----> count = 51
+----> count = 52
+----> count = 53
+----> count = 54
+I (34840) mesh: 4433<active>parent layer:1(node), channel:7, rssi:-49, assoc:1(cnx rssi threshold:-120)my_assoc:0
+----> count = 55
+----> count = 56
+----> count = 57
+I (36350) mesh: 5177<scan>parent layer:1, rssi:-46, assoc:1(cnx rssi threshold:-120)
+I (36350) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:0, candidate:1, root:1, topMAP:0[c:0,i:2][b8:27:eb:22:ef:da]<weak>
+I (36360) mesh: 6563[weak]try rssi_threshold:-120, backoff times:0, max:5<-78,-82,-85>
+I (36360) mesh: 616[monitor]no change, parent:3c:71:bf:0d:7e:1d, rssi:-46
+I (36370) mesh: 1891<arm>parent monitor, my layer:2(cap:25)(node), interval:383677ms, retries:3<>
+----> count = 58
+----> count = 59
+----> count = 60
+----> count = 61
+----> count = 62
+----> count = 63
+----> count = 64
+----> count = 65
+----> count = 66
+----> count = 67
+----> count = 68
+----> count = 69
+----> count = 70
+----> count = 71
+----> count = 72
+----> count = 73
+----> count = 74
+----> count = 75
+----> count = 76
+----> count = 77
+----> count = 78
+----> count = 79
+----> count = 80
+----> count = 81
+----> count = 82
+----> count = 83
+
+

@@ -13,10 +13,13 @@
 #define PASSWD "esp32raspberry"
 #define CHANNEL 7
 
+#define RX_BUF_SIZE  20
+#define TX_BUF_SIZE  20
+
 
 
 static const char *MESH_TAG = "mesh_main";
-static const uint8_t MESH_ID[6] = { 0x77, 0x77, 0x77, 0x77, 0x77, 0x77};
+static const uint8_t MESH_ID[6] = { 0x77, 0x77, 0x77, 0x77, 0x77, 0x77}; // 6 octet apparait dans trame wireshark? change dans le code ?
 static bool is_running = true;
 static bool is_mesh_connected = false;
 static mesh_addr_t mesh_parent_addr;
@@ -26,25 +29,28 @@ void esp_mesh_tx(void *arg){
     is_running = true;
     esp_err_t err;
     int count = 0;//nombre de messages envoyes
-    uint8_t i = 1;
-    uint8_t tx_buf[1] = {5};
+    //uint8_t tx_buf[TX_BUF_SIZE]= {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
+    uint8_t tx_buf[TX_BUF_SIZE]= {238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238};
+    //uint8_t tx_buf[TX_BUF_SIZE]= {13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14};
     mesh_data_t data;
     data.data = tx_buf;
-    data.size = sizeof(tx_buf);
+    data.size = sizeof(tx_buf); // pas depasser MESH_MPS cad 1472 bytes
     data.proto = MESH_PROTO_BIN;
-    data.tos = MESH_TOS_P2P;
+
 
     while(is_running){
         if(!esp_mesh_is_root()){
             err = esp_mesh_send(&mesh_parent_addr, &data, MESH_DATA_P2P, NULL, 0);
+            //err = esp_mesh_send(NULL, &data, 0, NULL, 0);
             if(err){
                 printf("----> ERROR A: count = %d\n", count);
             }else{
                 count++;
-                i++;
-                if(i==254){
-                    i=0;
-                }
+                /*tx_buf[0] = tx_buf[0] + 1;
+                if(tx_buf[0] == 254){
+                    tx_buf[0] = 0;
+                }*/
+
                 printf("----> count = %d\n", count);
                 vTaskDelay(500 / portTICK_PERIOD_MS);//500 ms
                 continue;
@@ -58,6 +64,13 @@ void esp_mesh_tx(void *arg){
 
 }
 
+void printArray(uint8_t *array, int size){
+	for(int i=0; i<size; i++){
+	    printf("%d ",array[i]);
+	}
+	printf("\n");
+}
+
 void esp_mesh_rx(void *arg){
     is_running = true;
     esp_err_t err;
@@ -65,15 +78,21 @@ void esp_mesh_rx(void *arg){
 
     mesh_addr_t from;
     
-    uint8_t rx_buf[1] = {0};
+    uint8_t rx_buf[RX_BUF_SIZE]={0,};
     mesh_data_t data;
     int flag = 0;
     data.data = rx_buf;
-    data.size = 1;
+    data.size = sizeof(rx_buf);
+    //data.proto = MESH_PROTO_BIN;
+
+    //mesh_rx_pending_t pending;
 
     while(is_running){
-        data.size = 1;
+        //data.size = 1;
         if(esp_mesh_is_root()){
+            //esp_mesh_get_rx_pending(&pending);
+            //ESP_LOGE(MESH_TAG, "number pending:%d", pending.toSelf);
+
             err = esp_mesh_recv(&from, &data, 5000, &flag, NULL, 0);
             if(err == ESP_ERR_MESH_TIMEOUT){
                 ESP_LOGE(MESH_TAG, "ERROR B: TIMEOUT");
@@ -94,7 +113,8 @@ void esp_mesh_rx(void *arg){
                 ESP_LOGE(MESH_TAG, "ERROR C:");
             }else{
                 count++;
-                printf("---->receive data: %d\n", rx_buf[0]);
+                printf("---->receive data: \n");
+                printArray(rx_buf, RX_BUF_SIZE);
             }
 
         }else{
@@ -324,6 +344,7 @@ void app_main(void)
 //#endif// ---
     //ESP_ERROR_CHECK(esp_event_handler_register(MESH_EVENT, ESP_EVENT_ANY_ID, &mesh_event_handler, NULL));// ---
     mesh_cfg_t cfg = MESH_INIT_CONFIG_DEFAULT();
+    //cfg.crypto_funcs = NULL;
     /* mesh ID */
     memcpy((uint8_t *) &cfg.mesh_id, MESH_ID, 6);
     /* mesh event callback */
@@ -336,12 +357,15 @@ void app_main(void)
            strlen(PASSWD));
     /* mesh softAP */
     //ESP_ERROR_CHECK(esp_mesh_set_ap_authmode(CONFIG_MESH_AP_AUTHMODE));// ---
-    cfg.mesh_ap.max_connection = CONFIG_MESH_AP_CONNECTIONS;// ---
-    memcpy((uint8_t *) &cfg.mesh_ap.password, CONFIG_MESH_AP_PASSWD,
-           strlen(CONFIG_MESH_AP_PASSWD));
+    cfg.mesh_ap.max_connection = 4;// ---
+    memcpy((uint8_t *) &cfg.mesh_ap.password, "toto",
+           strlen("toto"));
     ESP_ERROR_CHECK(esp_mesh_set_config(&cfg));
+    esp_mesh_set_ie_crypto_funcs(NULL);
+    //esp_mesh_set_ie_crypto_key("cleaes", 4);
     /* mesh start */
     ESP_ERROR_CHECK(esp_mesh_start());
+
     ESP_LOGI(MESH_TAG, "mesh starts successfully, heap:%d, %s\n",  esp_get_free_heap_size(),
              esp_mesh_is_root_fixed() ? "root fixed" : "root not fixed");
 }
