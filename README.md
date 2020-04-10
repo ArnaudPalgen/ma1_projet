@@ -21,8 +21,8 @@ Le [rapport de projet](./rapport/out/rapportProjet.pdf) décrit ces étapes en d
 ## Outils utilisés
 - Visual Studio Code
 - Wireshark: utilisé avec l'interfac Wi-Fi Edimax pour écouter le traffic Wi-Fi du réseau MESH.<br />
-Paramètrage de l'interface en mode *monitor* sous Ubuntu 18.04.4 LTS:
-```console
+Paramètrage de l'interface en mode *monitor* sous Ubuntu 18.04.4 LTS réalisé via [ce tutoriel](https://sandilands.info/sgordon/capturing-wifi-in-monitor-mode-with-iw) [consulté le 10 avril 2020].
+<!--```console
 user@computer:~$ iwconfig <interface_name>
 <interface_name>  IEEE 802.11  ESSID:off/any  
           Mode:Managed  Access Point: Not-Associated   Tx-Power=20 dBm   
@@ -37,7 +37,7 @@ user@computer:~$ iwconfig <interface_name>
           Power Management:off
           
 ```
-
+-->
 - ...
 
 ## Matériel utilisé
