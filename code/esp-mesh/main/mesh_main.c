@@ -7,11 +7,19 @@
 #include "esp_mesh_internal.h"
 #include "nvs_flash.h"
 
+#include "lwip/err.h"
+#include "lwip/sockets.h"
+#include "lwip/sys.h"
+#include <lwip/netdb.h>
+
 
 
 #define SSID "raspberryWIFI"
 #define PASSWD "esp32raspberry"
 #define CHANNEL 7
+
+#define DEST_ADDR "192.168.4.1"
+#define PORT 5005
 
 #define RX_BUF_SIZE  20
 #define TX_BUF_SIZE  20
@@ -38,10 +46,17 @@ void esp_mesh_tx(void *arg){
     data.proto = MESH_PROTO_BIN;
 
 
+    mesh_addr_t to;
+    ip4_addr_t address;
+    address.addr = ipaddr_addr("192.168.4.1");
+    to.mip.ip4 = address;
+    to.mip.port=5005;
+
     while(is_running){
         if(!esp_mesh_is_root()){
-            err = esp_mesh_send(&mesh_parent_addr, &data, MESH_DATA_P2P, NULL, 0);
-            //err = esp_mesh_send(NULL, &data, 0, NULL, 0);
+            //err = esp_mesh_send(&mesh_parent_addr, &data, MESH_DATA_P2P, NULL, 0); // parent address
+            //err = esp_mesh_send(NULL, &data, 0, NULL, 0); // to root
+            err = esp_mesh_send(&to, &data, MESH_DATA_TODS, NULL, 0);
             if(err){
                 printf("----> ERROR A: count = %d\n", count);
             }else{
@@ -52,7 +67,7 @@ void esp_mesh_tx(void *arg){
                 }*/
 
                 printf("----> count = %d\n", count);
-                vTaskDelay(500 / portTICK_PERIOD_MS);//500 ms
+                vTaskDelay(2500 / portTICK_PERIOD_MS);//500 ms
                 continue;
             }
         }else{
@@ -77,6 +92,7 @@ void esp_mesh_rx(void *arg){
     int count = 0;//nbr de messages recu
 
     mesh_addr_t from;
+    mesh_addr_t to;
     
     uint8_t rx_buf[RX_BUF_SIZE]={0,};
     mesh_data_t data;
@@ -86,6 +102,7 @@ void esp_mesh_rx(void *arg){
     //data.proto = MESH_PROTO_BIN;
 
     //mesh_rx_pending_t pending;
+    char addr_str[128];
 
     while(is_running){
         //data.size = 1;
@@ -93,7 +110,8 @@ void esp_mesh_rx(void *arg){
             //esp_mesh_get_rx_pending(&pending);
             //ESP_LOGE(MESH_TAG, "number pending:%d", pending.toSelf);
 
-            err = esp_mesh_recv(&from, &data, 5000, &flag, NULL, 0);
+            //err = esp_mesh_recv(&from, &data, 5000, &flag, NULL, 0);
+            err = esp_mesh_recv_toDS(&from, &to, &data, 5000, &flag, NULL, 0);
             if(err == ESP_ERR_MESH_TIMEOUT){
                 ESP_LOGE(MESH_TAG, "ERROR B: TIMEOUT");
             }
@@ -115,6 +133,49 @@ void esp_mesh_rx(void *arg){
                 count++;
                 printf("---->receive data: \n");
                 printArray(rx_buf, RX_BUF_SIZE);
+
+                //create socket
+                //mes_addr_t.mip.ipv4/port ipv4 -> ip4_addr_t & port -> unint16_t
+                //int sock = socket();
+                //int error = sendtp(sock, /*data, data.size, flag=0, to, to.size*/)
+                
+                //struct sockaddr_in destAddr;
+                //destAddr.sin_family = AF_INET;
+                //destAddr.sin_port = htons(5005);//from.mip.port;
+                //destAddr.sin_addr.s_addr = inet_addr("192.168.4.1");//from.mip.ip4.addr;//u32_t from ip4_addr.h
+                //https://github.com/yarrick/lwip/blob/master/src/include/lwip/ip4_addr.h
+                static const char *payload = "Hello Home!";
+                struct sockaddr_in destAddr;
+                destAddr.sin_addr.s_addr = inet_addr(DEST_ADDR);
+                destAddr.sin_port = htons(PORT);
+                destAddr.sin_family = AF_INET;
+                inet_ntoa_r(destAddr.sin_addr, addr_str, sizeof(addr_str) - 1);
+
+                const struct sockaddr * realDest = (struct sockaddr *)&destAddr;
+                ESP_LOGI(MESH_TAG, "send to %s", addr_str);
+                ESP_LOGI(MESH_TAG, "dest add is null: %d \n", (realDest == NULL));
+                ESP_LOGI(MESH_TAG, "dest addr len is zero: %d \n", (sizeof(realDest) == 0));
+                ESP_LOGI(MESH_TAG, "dest len is ok: %d \n", (sizeof(realDest) == sizeof(struct sockaddr_in)));
+                ESP_LOGI(MESH_TAG, "dest addr type valid: %d\n", (realDest->sa_family == AF_INET));
+                ESP_LOGI(MESH_TAG, "dest addr aligned: %d\n", ((((mem_ptr_t)(realDest)) % 4) == 0));
+
+                int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);//address family, udp socket, ip protocol (IPV4)
+
+                if(sock < 0){
+                    ESP_LOGE(MESH_TAG, "Unable to create socket %d", sock);
+                }else{
+                    ESP_LOGI(MESH_TAG, "Socket created");
+                }
+                int error = sendto(sock, payload, sizeof(payload), 0, (struct sockaddr *)&destAddr, sizeof(destAddr));
+
+                if(error < 0){
+                    ESP_LOGE(MESH_TAG, "Can't send errno: %d", err);
+                }else{
+                    ESP_LOGI(MESH_TAG, "Message sent to %s",addr_str);
+                }
+
+
+
             }
 
         }else{
