@@ -13,7 +13,7 @@ L'environnement de développement utilisé est [ESP-IDF v3.3.1](https://docs.esp
 et un protocole de routage MESH adapté au projet.
 2. Développer un réseau MESH avec [ESP-MESH](https://docs.espressif.com/projects/esp-idf/en/v3.3.1/api-guides/mesh.html) d'IDF ([esp-mesh](./code/esp-mesh)).
 3. Évaluer les performances de ce réseau.
-4. Etudier ESP-NOW qui pourrait servir de base pour implémenter *AODV*. ([ESP_NOW](./code/esp-now))
+4. Etudier [ESP-NOW](https://docs.espressif.com/projects/esp-idf/en/v3.3.1/api-reference/network/esp_now.html) qui pourrait servir de base pour implémenter *AODV*. ([esp-now](./code/esp-now))
 5. Développer un réseau MESH avec le protocole *AODV* ([aodv](./code/aodv)).
 6. Évaluer les performances de ce réseau.
 
