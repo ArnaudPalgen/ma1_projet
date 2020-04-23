@@ -1,11 +1,26 @@
+import time
+from socket import *
+import sys
 
-import socket
-UDP_IP = "192.168.4.1"
-UDP_PORT = 5005
-sock = socket.socket(socket.AF_INET, # Internet
-                     socket.SOCK_DGRAM) # UDP
-sock.bind((UDP_IP, UDP_PORT))
- 
-while True:
-    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-    print "received message:", data
+IP = sys.argv[1]
+PORT = 5005
+BUFF_SIZE = 1024
+
+try:
+        print("create socket for ip : ", IP)
+        s = socket(AF_INET, SOCK_STREAM)
+        s.setsockopt(SOL_SOCKET, SO_REUSEADDR, -1)
+        s.bind((IP, PORT))
+        s.listen(1)
+        print("listen on port", PORT)
+        conn, addr = s.accept()
+        print(addr, "connected!")
+
+        while True:
+                data = conn.recv(BUFF_SIZE)
+                if data:
+                        print('[',int(round(time.time() * 1000)),']','data: ', data)#time in milliseconds
+except KeyboardInterrupt:
+        print('\n Good Bye...')
+        s.close()
+        sys.exit(0)

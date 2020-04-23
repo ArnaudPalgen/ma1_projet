@@ -5,4 +5,6 @@
 *.log
 *.out
 *.synctex.gz
+*sdkconfig
+*sdkconfig.*
 /**/build

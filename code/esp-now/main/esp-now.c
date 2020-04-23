@@ -15,7 +15,7 @@ static uint8_t s_example_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0
 
 static uint8_t peer_addrA[ESP_NOW_ETH_ALEN] = {0x3C, 0x71, 0xBF, 0x0D, 0x7E, 0x1C};
 static uint8_t peer_addrB[ESP_NOW_ETH_ALEN] = {0x3c, 0x71, 0xbf, 0x0d, 0x7e, 0x18};
-
+static uint8_t peer_broadcast[ESP_NOW_ETH_ALEN] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
 
 static esp_err_t event_handler(void *ctx, system_event_t *event)
@@ -46,7 +46,7 @@ void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len){
     ESP_LOGI(TAG, "receive callback function");
     ESP_LOGI(TAG, "DATA LEN%d:", data_len);
     printf("data\n");
-    printArray(&data, data_len);
+    printArray(data, data_len);
 }
 
 
@@ -78,13 +78,22 @@ void app_main(void){
     uint8_t myAddress[6];
     esp_wifi_get_mac(ESPNOW_WIFI_IF, &myAddress);
 
-    const uint8_t data[20]= {238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238};
+    const uint8_t data[20]= {238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 237};
 
-    if (memcmp(&myAddress, &peer_addrB, sizeof(myAddress)) == 0){
-        ESP_LOGI(TAG, "send to a");
-        memcpy(peer.peer_addr, peer_addrA, ESP_NOW_ETH_ALEN);
+    if (memcmp(&myAddress, &peer_addrA, sizeof(myAddress)) == 0){
+        //ESP_LOGI(TAG, "send to a");
+        //memcpy(peer.peer_addr, peer_addrA, ESP_NOW_ETH_ALEN);
+        //ESP_ERROR_CHECK(esp_now_add_peer(&peer));
+        //esp_now_send(&peer_addrA, &data, sizeof(data));
+
+        //send to broadcast
+        ESP_LOGI(TAG, "send to broadcast");
+        memcpy(peer.peer_addr, peer_broadcast, ESP_NOW_ETH_ALEN);
         ESP_ERROR_CHECK(esp_now_add_peer(&peer));
-        esp_now_send(&peer_addrA, &data, sizeof(data));
+        while(false){
+            esp_now_send(&peer_broadcast, &data, sizeof(data));
+        }
+        
     }/*else{
         ESP_LOGI(TAG, "send to b");
         memcpy(peer.peer_addr, peer_addrB, ESP_NOW_ETH_ALEN);

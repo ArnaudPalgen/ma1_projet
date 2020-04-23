@@ -12,13 +12,7 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
-
-
-#define SSID "raspberryWIFI"
-#define PASSWD "esp32raspberry"
-#define CHANNEL 7
-
-#define DEST_ADDR "192.168.4.1"
+#define DEST_ADDR "192.168.0.100"
 #define PORT 5005
 
 #define RX_BUF_SIZE  20
@@ -36,10 +30,7 @@ static int mesh_layer = -1;
 void esp_mesh_tx(void *arg){
     is_running = true;
     esp_err_t err;
-    int count = 0;//nombre de messages envoyes
-    //uint8_t tx_buf[TX_BUF_SIZE]= {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
     uint8_t tx_buf[TX_BUF_SIZE]= {238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238};
-    //uint8_t tx_buf[TX_BUF_SIZE]= {13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14};
     mesh_data_t data;
     data.data = tx_buf;
     data.size = sizeof(tx_buf); // pas depasser MESH_MPS cad 1472 bytes
@@ -48,25 +39,19 @@ void esp_mesh_tx(void *arg){
 
     mesh_addr_t to;
     ip4_addr_t address;
-    address.addr = ipaddr_addr("192.168.4.1");
+    address.addr = ipaddr_addr(DEST_ADDR);
     to.mip.ip4 = address;
-    to.mip.port=5005;
+    to.mip.port=PORT;
 
     while(is_running){
         if(!esp_mesh_is_root()){
             //err = esp_mesh_send(&mesh_parent_addr, &data, MESH_DATA_P2P, NULL, 0); // parent address
             //err = esp_mesh_send(NULL, &data, 0, NULL, 0); // to root
-            err = esp_mesh_send(&to, &data, MESH_DATA_TODS, NULL, 0);
+            err = esp_mesh_send(&to, &data, MESH_DATA_TODS, NULL, 0);// to external ip
             if(err){
-                printf("----> ERROR A: count = %d\n", count);
+                ESP_LOGI(MESH_TAG, "unable to send ...");
             }else{
-                count++;
-                /*tx_buf[0] = tx_buf[0] + 1;
-                if(tx_buf[0] == 254){
-                    tx_buf[0] = 0;
-                }*/
-
-                printf("----> count = %d\n", count);
+                ESP_LOGI(MESH_TAG, "message sent");
                 vTaskDelay(2500 / portTICK_PERIOD_MS);//500 ms
                 continue;
             }
@@ -86,104 +71,150 @@ void printArray(uint8_t *array, int size){
 	printf("\n");
 }
 
+void esp_mesh_external_rx(void *arg){
+    esp_err_t err;
+
+    uint8_t rx_buf[RX_BUF_SIZE]={0,};
+
+    mesh_addr_t mesh_from_addr;
+    mesh_addr_t mesh_to_addr;
+    mesh_addr_t mesh_toOld_addr;
+    mesh_data_t mesh_data;
+    mesh_data.data = rx_buf;
+    mesh_data.size = sizeof(rx_buf);
+    
+    int flag = 0;
+    int timeout = 5000;
+
+    int sock;
+    int sock_error;
+
+    struct sockaddr_in ip_to_addr;
+    struct sockaddr_in ip_from_addr;
+    
+    ip_to_addr.sin_family = AF_INET;
+    
+    ip_from_addr.sin_family = AF_INET;
+    ip_from_addr.sin_port = htons(2002);
+    
+    tcpip_adapter_ip_info_t ipInfo;
+    esp_err_t r = tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);
+    if (r != ESP_OK){
+        ESP_LOGE(MESH_TAG, "can't get info");
+    }
+    
+    memcpy((u32_t *) &ip_from_addr.sin_addr, &ipInfo.ip.addr, sizeof(ipInfo.ip.addr));
+
+    bool is_running = true;
+    int maxAttempt = 10;
+    int attempt = 0;
+
+    char addr_str[128];
+
+    err = esp_mesh_recv_toDS(&mesh_from_addr, &mesh_to_addr, &mesh_data, timeout, &flag, NULL, 0);
+    if(err == ESP_OK){
+        ESP_LOGI(MESH_TAG, "receive external data");
+        printArray(rx_buf, RX_BUF_SIZE);
+    }
+    memcpy(&mesh_toOld_addr, &mesh_to_addr, sizeof(mesh_to_addr));
+    is_running = (err == ESP_OK);
+
+    while(is_running && attempt < maxAttempt){
+        ip_to_addr.sin_port = htons(mesh_to_addr.mip.port);
+        memcpy((u32_t *) &ip_to_addr.sin_addr, &mesh_to_addr.mip.ip4.addr, sizeof(mesh_to_addr.mip.ip4.addr));
+        
+        sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);//address family, tcp socket, ip protocol (IPV4)
+        
+        int e = bind(sock, (struct sockaddr *)&ip_from_addr, sizeof(ip_from_addr));
+        if(e < 0){
+            ESP_LOGE(MESH_TAG, "can't bind");
+        }
+        sock_error = connect(sock, (struct sockaddr *)&ip_to_addr, sizeof(ip_to_addr));
+
+        if(sock < 0 || sock_error != 0){
+            ESP_LOGE(MESH_TAG, "Unable to create and connect socket %d", sock);
+            if(attempt < maxAttempt){
+                ESP_LOGE(MESH_TAG, "retry....");
+                attempt ++;
+                continue;
+            }else{
+                ESP_LOGE(MESH_TAG, "maximum number of attempts reached");
+                break;
+            }
+        }else{
+            ESP_LOGI(MESH_TAG, "Socket created and connected");
+            attempt = 0;
+        }
+        do{
+            sock_error = send(sock, mesh_data.data, mesh_data.size, 0);
+            if(sock_error < 0){
+                ESP_LOGE(MESH_TAG, "Can't send");
+            }else{
+                inet_ntoa_r(ip_to_addr.sin_addr, addr_str, sizeof(addr_str) - 1);
+                ESP_LOGI(MESH_TAG, "Message sent to %s",addr_str);
+            }
+            
+            err = esp_mesh_recv_toDS(&mesh_from_addr, &mesh_to_addr, &mesh_data, timeout, &flag, NULL, 0);
+            if(err == ESP_OK){
+                ESP_LOGI(MESH_TAG, "receive external data");
+                printArray(rx_buf, RX_BUF_SIZE);
+            }
+            else{
+                is_running = false;
+                break;
+            }
+
+
+        }while(mesh_toOld_addr.mip.ip4.addr == mesh_toOld_addr.mip.ip4.addr);
+        ESP_LOGE(MESH_TAG, "Shutting down socket and restarting...");
+        shutdown(sock, 0);
+        close(sock);
+    }
+    vTaskDelete(NULL);
+
+}
+
 void esp_mesh_rx(void *arg){
     is_running = true;
-    esp_err_t err;
-    int count = 0;//nbr de messages recu
+    esp_err_t err = ESP_OK;
 
     mesh_addr_t from;
-    mesh_addr_t to;
     
     uint8_t rx_buf[RX_BUF_SIZE]={0,};
     mesh_data_t data;
     int flag = 0;
     data.data = rx_buf;
     data.size = sizeof(rx_buf);
-    //data.proto = MESH_PROTO_BIN;
 
-    //mesh_rx_pending_t pending;
-    char addr_str[128];
 
     while(is_running){
-        //data.size = 1;
-        if(esp_mesh_is_root()){
-            //esp_mesh_get_rx_pending(&pending);
-            //ESP_LOGE(MESH_TAG, "number pending:%d", pending.toSelf);
-
-            //err = esp_mesh_recv(&from, &data, 5000, &flag, NULL, 0);
-            err = esp_mesh_recv_toDS(&from, &to, &data, 5000, &flag, NULL, 0);
-            if(err == ESP_ERR_MESH_TIMEOUT){
-                ESP_LOGE(MESH_TAG, "ERROR B: TIMEOUT");
-            }
-            else if(err == ESP_ERR_MESH_ARGUMENT){
-                ESP_LOGE(MESH_TAG, "ERROR: MESH_ARGUMENT");
-                ESP_LOGI(MESH_TAG, "   MAC: "MACSTR"", MAC2STR(from.addr));
-                printf("---->receive data: %d\n", rx_buf[0]);
-                printf("---->flag: %d\n", flag);
-            }
-            else if(err == ESP_ERR_MESH_NOT_START){
-                ESP_LOGE(MESH_TAG, "ERROR: MESH_NOT_START");
-            }
-            else if(err == ESP_ERR_MESH_DISCARD){
-                ESP_LOGE(MESH_TAG, "ERROR: MESH_DISCARD");
-            }
-            else if(err){
-                ESP_LOGE(MESH_TAG, "ERROR C:");
-            }else{
-                count++;
-                printf("---->receive data: \n");
-                printArray(rx_buf, RX_BUF_SIZE);
-
-                //create socket
-                //mes_addr_t.mip.ipv4/port ipv4 -> ip4_addr_t & port -> unint16_t
-                //int sock = socket();
-                //int error = sendtp(sock, /*data, data.size, flag=0, to, to.size*/)
-                
-                //struct sockaddr_in destAddr;
-                //destAddr.sin_family = AF_INET;
-                //destAddr.sin_port = htons(5005);//from.mip.port;
-                //destAddr.sin_addr.s_addr = inet_addr("192.168.4.1");//from.mip.ip4.addr;//u32_t from ip4_addr.h
-                //https://github.com/yarrick/lwip/blob/master/src/include/lwip/ip4_addr.h
-                static const char *payload = "Hello Home!";
-                struct sockaddr_in destAddr;
-                destAddr.sin_addr.s_addr = inet_addr(DEST_ADDR);
-                destAddr.sin_port = htons(PORT);
-                destAddr.sin_family = AF_INET;
-                inet_ntoa_r(destAddr.sin_addr, addr_str, sizeof(addr_str) - 1);
-
-                const struct sockaddr * realDest = (struct sockaddr *)&destAddr;
-                ESP_LOGI(MESH_TAG, "send to %s", addr_str);
-                ESP_LOGI(MESH_TAG, "dest add is null: %d \n", (realDest == NULL));
-                ESP_LOGI(MESH_TAG, "dest addr len is zero: %d \n", (sizeof(realDest) == 0));
-                ESP_LOGI(MESH_TAG, "dest len is ok: %d \n", (sizeof(realDest) == sizeof(struct sockaddr_in)));
-                ESP_LOGI(MESH_TAG, "dest addr type valid: %d\n", (realDest->sa_family == AF_INET));
-                ESP_LOGI(MESH_TAG, "dest addr aligned: %d\n", ((((mem_ptr_t)(realDest)) % 4) == 0));
-
-                int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);//address family, udp socket, ip protocol (IPV4)
-
-                if(sock < 0){
-                    ESP_LOGE(MESH_TAG, "Unable to create socket %d", sock);
-                }else{
-                    ESP_LOGI(MESH_TAG, "Socket created");
-                }
-                int error = sendto(sock, payload, sizeof(payload), 0, (struct sockaddr *)&destAddr, sizeof(destAddr));
-
-                if(error < 0){
-                    ESP_LOGE(MESH_TAG, "Can't send errno: %d", err);
-                }else{
-                    ESP_LOGI(MESH_TAG, "Message sent to %s",addr_str);
-                }
-
-
-
-            }
-
-        }else{
-            printf("---->is child -> don't listen\n");
-            vTaskDelete(NULL);
+        err = esp_mesh_recv(&from, &data, 5000, &flag, NULL, 0);
+        if(err != ESP_OK){
+            is_running = false;
+            break;
         }
-
+            
+        ESP_LOGI(MESH_TAG, "receive internal data");
+        printArray(rx_buf, RX_BUF_SIZE);
     }
+
+    if(err == ESP_ERR_MESH_TIMEOUT){
+        ESP_LOGE(MESH_TAG, "ERROR: TIMEOUT");
+    }
+    else if(err == ESP_ERR_MESH_ARGUMENT){
+        ESP_LOGE(MESH_TAG, "ERROR: MESH_ARGUMENT");
+        ESP_LOGI(MESH_TAG, "MAC: "MACSTR"", MAC2STR(from.addr));
+    }
+    else if(err == ESP_ERR_MESH_NOT_START){
+        ESP_LOGE(MESH_TAG, "ERROR: MESH_NOT_START");
+    }
+    else if(err == ESP_ERR_MESH_DISCARD){
+        ESP_LOGE(MESH_TAG, "ERROR: MESH_DISCARD");
+    }
+    else if(err != ESP_OK){
+        ESP_LOGE(MESH_TAG, "UNKNOWN ERROR");
+    }
+
     vTaskDelete(NULL);
 
 }
@@ -202,8 +233,17 @@ esp_err_t esp_mesh_comm_p2p_start(void)
          * priorite de la tache de 0 a 7-1 ifdef SMALL_TEST, de 0 a 25-1 sinon
          * ? pour creer la tache en dehors du xTaskCreate
          */
-        xTaskCreate(esp_mesh_tx, "MPTX", 3072, NULL, 5, NULL);
-        xTaskCreate(esp_mesh_rx, "MPRX", 3072, NULL, 5, NULL);
+        
+        if(esp_mesh_is_root()){
+            ESP_LOGI(MESH_TAG, "is root -> prepare to receive...");
+            xTaskCreate(esp_mesh_external_rx, "MPRXE", 3072, NULL, 5, NULL);
+            xTaskCreate(esp_mesh_rx, "MPRX", 3072, NULL, 5, NULL);
+        }else{
+            ESP_LOGI(MESH_TAG, "is child -> prepare to send...");
+            xTaskCreate(esp_mesh_tx, "MPTX", 3072, NULL, 5, NULL);
+        }
+        
+        
     }
     return ESP_OK;
 }
@@ -370,6 +410,7 @@ void mesh_event_handler(mesh_event_t event)
 void app_main(void)
 {
     //ESP_ERROR_CHECK(mesh_light_init());// ---
+    //ESP_ERROR_CHECK(nvs_flash_erase());
     ESP_ERROR_CHECK(nvs_flash_init());
     /*  tcpip initialization */
     tcpip_adapter_init();
@@ -379,16 +420,16 @@ void app_main(void)
      * */
     ESP_ERROR_CHECK(tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_AP));
     ESP_ERROR_CHECK(tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA));
-#if 0
-    /* static ip settings */
-    tcpip_adapter_ip_info_t sta_ip;
-    sta_ip.ip.addr = ipaddr_addr("192.168.1.102");
-    sta_ip.gw.addr = ipaddr_addr("192.168.1.1");
-    sta_ip.netmask.addr = ipaddr_addr("255.255.255.0");
-    tcpip_adapter_set_ip_info(WIFI_IF_STA, &sta_ip);
-#endif
+//#if 0
+//    /* static ip settings */
+//    tcpip_adapter_ip_info_t sta_ip;
+//    sta_ip.ip.addr = ipaddr_addr("192.168.1.102");
+//    sta_ip.gw.addr = ipaddr_addr("192.168.1.1");
+//    sta_ip.netmask.addr = ipaddr_addr("255.255.255.0");
+//    tcpip_adapter_set_ip_info(WIFI_IF_STA, &sta_ip);
+//#endif
     /*  wifi initialization */
-    ESP_ERROR_CHECK(esp_event_loop_init(NULL, NULL));// ---
+    //ESP_ERROR_CHECK(esp_event_loop_init(NULL, NULL));// ---
     
     wifi_init_config_t config = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&config));
@@ -411,11 +452,11 @@ void app_main(void)
     /* mesh event callback */
     cfg.event_cb = &mesh_event_handler;// ---
     /* router */
-    cfg.channel = CHANNEL;
-    cfg.router.ssid_len = strlen(SSID);
-    memcpy((uint8_t *) &cfg.router.ssid, SSID, cfg.router.ssid_len);
-    memcpy((uint8_t *) &cfg.router.password, PASSWD,
-           strlen(PASSWD));
+    cfg.channel = CONFIG_MESH_CHANNEL;
+    cfg.router.ssid_len = strlen(CONFIG_MESH_ROUTER_SSID);
+    memcpy((uint8_t *) &cfg.router.ssid, CONFIG_MESH_ROUTER_SSID, cfg.router.ssid_len);
+    memcpy((uint8_t *) &cfg.router.password, CONFIG_MESH_ROUTER_PASSWD,
+           strlen(CONFIG_MESH_ROUTER_PASSWD));
     /* mesh softAP */
     //ESP_ERROR_CHECK(esp_mesh_set_ap_authmode(CONFIG_MESH_AP_AUTHMODE));// ---
     cfg.mesh_ap.max_connection = 4;// ---
