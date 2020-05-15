@@ -1,0 +1,214 @@
+Python requirements from /home/arnaud/esp/esp-idf/requirements.txt are satisfied.
+ets Jun  8 2016 00:22:57
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0018,len:4
+load:0x3fff001c,len:6752
+ho 0 tail 12 room 4
+load:0x40078000,len:12072
+ho 0 tail 12 room 4
+load:0x40080400,len:6708
+entry 0x40080778
+[0;32mI (75) boot: Chip Revision: 1[0m
+[0;32mI (75) boot_comm: chip revision: 1, min. bootloader chip revision: 0[0m
+[0;32mI (42) boot: ESP-IDF v3.3.1 2nd stage bootloader[0m
+[0;32mI (43) boot: compile time 15:50:32[0m
+[0;32mI (43) boot: Enabling RNG early entropy source...[0m
+[0;32mI (47) boot: SPI Speed      : 40MHz[0m
+[0;32mI (51) boot: SPI Mode       : DIO[0m
+[0;32mI (55) boot: SPI Flash Size : 2MB[0m
+[0;32mI (59) boot: Partition Table:[0m
+[0;32mI (63) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (70) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (78) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (85) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (93) boot: End of partition table[0m
+[0;32mI (97) boot_comm: chip revision: 1, min. application chip revision: 0[0m
+[0;32mI (104) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x216ec (136940) map[0m
+[0;32mI (161) esp_image: segment 1: paddr=0x00031714 vaddr=0x3ffb0000 size=0x03104 ( 12548) load[0m
+[0;32mI (166) esp_image: segment 2: paddr=0x00034820 vaddr=0x40080000 size=0x00400 (  1024) load[0m
+[0;32mI (168) esp_image: segment 3: paddr=0x00034c28 vaddr=0x40080400 size=0x0b3e8 ( 46056) load[0m
+[0;32mI (196) esp_image: segment 4: paddr=0x00040018 vaddr=0x400d0018 size=0x90858 (591960) map[0m
+[0;32mI (404) esp_image: segment 5: paddr=0x000d0878 vaddr=0x4008b7e8 size=0x0462c ( 17964) load[0m
+[0;32mI (421) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (421) boot: Disabling RNG early entropy source...[0m
+[0;32mI (422) cpu_start: Pro cpu up.[0m
+[0;32mI (425) cpu_start: Application information:[0m
+[0;32mI (430) cpu_start: Project name:     esp-idf[0m
+[0;32mI (435) cpu_start: App version:      dd2a440[0m
+[0;32mI (440) cpu_start: Compile time:     Apr 24 2020 16:43:02[0m
+[0;32mI (446) cpu_start: ELF file SHA256:  17579e2bf160fac7...[0m
+[0;32mI (452) cpu_start: ESP-IDF:          v3.3.1[0m
+[0;32mI (457) cpu_start: Starting app cpu, entry point is 0x400810f8[0m
+[0;32mI (0) cpu_start: App cpu up.[0m
+[0;32mI (467) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (474) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (480) heap_init: At 3FFB9EC0 len 00026140 (152 KiB): DRAM[0m
+[0;32mI (487) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (493) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (499) heap_init: At 4008FE14 len 000101EC (64 KiB): IRAM[0m
+[0;32mI (506) cpu_start: Pro cpu start user code[0m
+[0;32mI (188) cpu_start: Starting scheduler on PRO CPU.[0m
+[0;32mI (0) cpu_start: Starting scheduler on APP CPU.[0m
+I (289) wifi: wifi driver task: 3ffc1b00, prio:23, stack:3584, core=0
+[0;32mI (289) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE[0m
+[0;32mI (289) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE[0m
+I (319) wifi: wifi firmware version: ac331d7
+I (319) wifi: config NVS flash: enabled
+I (319) wifi: config nano formating: disabled
+I (329) wifi: Init dynamic tx buffer num: 32
+I (329) wifi: Init data frame dynamic rx buffer num: 32
+I (329) wifi: Init management frame dynamic rx buffer num: 32
+I (339) wifi: Init management short buffer num: 32
+I (339) wifi: Init static rx buffer size: 1600
+I (349) wifi: Init static rx buffer num: 10
+I (349) wifi: Init dynamic rx buffer num: 32
+[0;32mI (449) phy: phy_version: 4102, 2fa7a43, Jul 15 2019, 13:06:06, 0, 0[0m
+I (449) wifi: mode : sta (3c:71:bf:0d:83:08)
+W (449) wifi: [beacon]interval:100ms
+I (449) wifi: mode : sta (3c:71:bf:0d:83:08) + softAP (3c:71:bf:0d:83:09)
+I (459) wifi: Total power save buffer number: 16
+I (459) wifi: Init max length of beacon: 752/752
+I (469) wifi: Init max length of beacon: 752/752
+I (479) mesh: <nvs>read layer:1
+I (479) mesh: <nvs>read assoc:1
+I (1469) wifi: Set ps type: 0
+
+I (1479) wifi: mode : sta (3c:71:bf:0d:83:08)
+I (1479) mesh: <MESH_NWK_LOOK_FOR_NETWORK>need_scan:0x1, need_scan_router:0x0, look_for_nwk_count:1
+I (1779) mesh: [FIND][ch:7]AP:0, otherID:0, MAP:0, idle:0, candidate:0, root:0[00:00:00:00:00:00]
+I (1779) mesh: [FIND:1]fail to find a network, channel:0, cfg<channel:7, router:Sitecom0BD453, 00:00:00:00:00:00>
+
+I (1789) mesh: <MESH_NWK_LOOK_FOR_NETWORK>need_scan:0x3, need_scan_router:0x1, look_for_nwk_count:2
+I (1919) mesh: [S1]Sitecom0BD453, 64:d1:a3:0b:d4:53, channel:7, rssi:-43
+I (1919) mesh: find router:[ssid_len:13]Sitecom0BD453, rssi:-43, 64:d1:a3:0b:d4:53(encrypted), new channel:7, old channel:0
+I (1929) mesh: [FIND][ch:7]AP:1, otherID:0, MAP:0, idle:0, candidate:0, root:0[64:d1:a3:0b:d4:53]router found<scan router>
+I (1939) mesh: [FIND:2]find a network, channel:7, cfg<channel:7, router:Sitecom0BD453, 00:00:00:00:00:00>
+
+I (1949) wifi: mode : sta (3c:71:bf:0d:83:08) + softAP (3c:71:bf:0d:83:09)
+W (1959) wifi: <MESH AP>adjust channel:7, secondary channel offset:1(40U)
+I (1959) wifi: Total power save buffer number: 16
+I (2269) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (2269) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (2279) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:1d,-120]
+I (2279) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:1d,-120]
+I (2289) mesh: 1250, vote myself, router rssi:-45 > voted rc_rssi:-120
+I (2299) mesh: [SCAN:1/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-45,reason:0,votes:1,idle][mine:1,voter:1(1.00)percent:0.90][128,1,3c:71:bf:0d:83:09]
+
+I (2609) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (2609) mesh: [FAIL][2]root:1, fail:1, normal:0, <pre>backoff:1
+
+I (2919) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (2919) mesh: [FAIL][3]root:1, fail:2, normal:0, <pre>backoff:1
+
+I (3049) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (3049) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (3059) mesh: [SCAN:2/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-41,reason:0,votes:1,idle][mine:1,voter:2(0.50)percent:0.90][128,1,3c:71:bf:0d:83:09]
+
+I (3379) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (3379) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (3389) mesh: [SCAN:3/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-39,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]
+
+I (3709) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (3709) mesh: [FAIL][6]root:3, fail:3, normal:0, <pre>backoff:3
+
+I (3839) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (3839) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (3849) mesh: [SCAN:4/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-41,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]
+
+I (4159) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (4159) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (4169) mesh: [SCAN:5/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-42,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]
+
+I (4489) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (4489) mesh: [FAIL][9]root:5, fail:4, normal:0, <pre>backoff:5
+
+I (4619) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (4619) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (4629) mesh: [SCAN:6/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-42,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]
+
+I (4949) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (4949) mesh: [FAIL][11]root:6, fail:5, normal:0, <pre>backoff:6
+
+I (5249) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (5259) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (5259) mesh: [SCAN:7/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-41,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]
+
+I (5579) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (5579) mesh: [FAIL][13]root:7, fail:6, normal:0, <pre>backoff:7
+
+I (5889) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (5889) mesh: [FAIL][14]root:7, fail:7, normal:0, <pre>backoff:7
+
+I (6199) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (6199) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (6209) mesh: [SCAN:8/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-46,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]
+
+I (6529) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (6529) mesh: [FAIL][16]root:8, fail:8, normal:0, <pre>backoff:8
+
+I (6829) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (6839) mesh: [FAIL][17]root:8, fail:9, normal:0, <pre>backoff:8
+
+I (7139) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (7139) mesh: [FAIL][18]root:8, fail:10, normal:0, <pre>backoff:8
+
+I (7269) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (7279) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (7279) mesh: [SCAN:9/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-41,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]
+
+I (7599) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (7599) mesh: [FAIL][20]root:9, fail:11, normal:0, <pre>backoff:9
+
+I (7909) mesh: [SCAN][ch:7]AP:1, other(ID:0, RD:0), MAP:1, idle:1, candidate:0, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]<>
+I (7909) mesh: [FAIL][21]root:9, fail:12, normal:0, <pre>backoff:9
+
+I (8039) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][64:d1:a3:0b:d4:53]router found<>
+I (8039) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4, 2nd_layer_count:0
+I (8049) mesh: [SCAN:10/10]rc[128][3c:71:bf:0d:83:09,-45], self[3c:71:bf:0d:83:08,-39,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]
+
+I (8069) mesh: <nvs>write layer:0
+I (8069) mesh: <nvs>write assoc:0
+W (8069) wifi: [beacon]interval:100ms
+I (8069) mesh: [DONE]connect to router:Sitecom0BD453, channel:7, rssi:-39, 64:d1:a3:0b:d4:53[layer:0, assoc:0], my_vote_num:2/voter_num:2, rc[3c:71:bf:0d:83:09/-45/1]
+I (8209) wifi: ap channel adjust o:7,1 n:7,2
+I (8209) wifi: new:<7,2>, old:<7,1>, ap:<7,2>, sta:<7,2>, prof:7
+I (8209) wifi: state: init -> auth (b0)
+I (8219) wifi: state: auth -> assoc (0)
+I (8229) wifi: state: assoc -> run (10)
+I (8429) wpa: <EAPOL>state:6
+I (8429) wpa: <EAPOL>receiving the 1/4 EAPOL-Key, state:6
+I (8439) wpa: <EAPOL>state:7
+I (8439) wpa: <EAPOL>receiving the 3/4 EAPOL-Key, state:7
+I (8439) wifi: connected with Sitecom0BD453, aid = 1, channel 7, 40D, bssid = 64:d1:a3:0b:d4:53
+I (8439) wifi: security type: 3, phy: bgn, rssi: -40
+I (8459) wifi: pm start, type: 0
+
+[0;31mE (8459) event: invalid static ip[0m
+I (8459) mesh: [scan]new scanning time:600ms
+W (8459) wifi: [beacon]new interval:300ms
+I (8469) mesh: <nvs>write layer:1
+[0;32mI (8469) mesh_internal: is root -> prepare to receive...[0m
+I (9249) wifi: AP's beacon interval = 1024000 us, DTIM period = 1
+W (9249) wifi: [beacon]new interval:1000ms
+I (9249) mesh: [scan]new scanning time:1500ms
+I (10439) wifi: new:<7,2>, old:<7,2>, ap:<7,2>, sta:<7,2>, prof:7
+I (10439) wifi: station: 3c:71:bf:0d:7e:1c join, AID=1, bgn, 40D
+I (10449) mesh: <nvs>write assoc:1
+[0;32mI (10499) mesh_internal: data received[0m
+238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 
+[0;32mI (10769) event: sta ip: 192.168.0.101, mask: 255.255.255.0, gw: 192.168.0.1[0m
+[0;32mI (11019) mesh_internal: data received[0m
+238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 
+[0;32mI (11579) mesh_internal: data received[0m
+238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 
+[0;32mI (12189) mesh_internal: data received[0m
+238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 
+[0;32mI (12709) mesh_internal: data received[0m
+238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 238 
+Checking Python dependencies...
+Running idf_monitor in directory /home/arnaud/Dropbox/Cours2019-2020/projet/projet_ma1/code/esp-mesh-internal
+Executing "/usr/bin/python /home/arnaud/esp/esp-idf/tools/idf_monitor.py -p /dev/ttyUSB0 -b 115200 /home/arnaud/Dropbox/Cours2019-2020/projet/projet_ma1/code/esp-mesh-internal/build/esp-mesh-internal.elf -m '/usr/bin/python' '/home/arnaud/esp/esp-idf/tools/idf.py' '-p' '/dev/ttyUSB0'"...

@@ -1,33 +1,166 @@
-\chapter{Implémentation}
+%\chapter{Implémentation}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Limitations}
+%        Le driver Wi-Fi d'\textit{IDF} ne nous permet pas d'avoir une connexion
+%        avec plusieurs noeuds simultanément. \espnow\ pourraît être une solution
+%        pour palier à ce problème.\\
+%    
+%    
+%        \textbf{ESP NOW}\\
+%            \espnow\ est un protocole de communication Wi-Fi sans connexion défini
+%            par Espressif.\\ Nous n'avons trouvé aucune documentation décrivant le
+%            fonctionnement de ce protocole.\\
+%            Avec la documentation disponible, nous savons qu'un noeud a une liste
+%            de \textit{peers} (ses voisins) avec qui il peut échanger des données.
+%            Le nombre de voisins est limité à 20. Cette limite ne posera pas 
+%            problème pour ce projet.
+%        
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Prochaines étapes}
+%        \begin{enumerate}
+%            \item Nous allons créer un réseau \espmesh. Ceci nous permettra de nous
+%            familiariser avec l'environnement \textit{IDF}.
+%            \item Nous évaluerons les performances et fonctionnalités de ce protocole.
+%            \item Nous implémenterons un protocole de routage mesh choisis plus haut.
+%            \item L'objectif est de l'implémenter au niveau de la couche liaison de données.
+%                Si nous rencontrons trop de difficulté ou que nous jugeons que ce 
+%                choix n'est pas judicieux, nous implémenterons ce protocole au niveau 
+%                de la couche réseau.
+%            \item Nous étudierons les différentes possibilités d'économies d'énergie
+%            \item Nous évaluerons les performances et fonctionnalités du prorotype créé. 
+%            
+%        \end{enumerate}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Limitations}
-        Le driver Wi-Fi d'\textit{IDF} ne nous permet pas d'avoir une connexion
-        avec plusieurs noeuds simultanément. \espnow\ pourraît être une solution
-        pour palier à ce problème.\\
+\chapter{Mise en oeuvre}
+    \todo{INTRO}\\
+    Nous avons utilisé la version 3.3.1 d'IDF car c'est une version stable suportée jusqu'en février 2022.
+    \section{ESP-MESH}
+    \begin{enumerate}
+        \item \textbf{\underline{Construction du réseau}}\\
+            Notre première étape a été d'établir un réseau \espmesh\ composé de deux noeuds (une racine et son enfant).
+            Voici un extrait du code permettant de construire ce réseau:\newpage
+            \begin{minted}[xleftmargin=\parindent,linenos]{c}
+void app_main(void){
+    /* stop DHCP server for softAP and station interfaces */
+    ESP_ERROR_CHECK(tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_AP));
+    ESP_ERROR_CHECK(tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA));
+
+    /* wifi initialisation */ 
+    wifi_init_config_t config = WIFI_INIT_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK(esp_wifi_init(&config));
+    ESP_ERROR_CHECK(esp_wifi_start());
+    /*  mesh initialisation*/
+    ESP_ERROR_CHECK(esp_mesh_init());
+    mesh_cfg_t cfg = MESH_INIT_CONFIG_DEFAULT();
+    /* event handler */
+    cfg.event_cb = &mesh_event_handler;
+
+            /* ... */
     
-    
-        \textbf{ESP NOW}\\
-            \espnow\ est un protocole de communication Wi-Fi sans connexion défini
-            par Espressif.\\ Nous n'avons trouvé aucune documentation décrivant le
-            fonctionnement de ce protocole.\\
-            Avec la documentation disponible, nous savons qu'un noeud a une liste
-            de \textit{peers} (ses voisins) avec qui il peut échanger des données.
-            Le nombre de voisins est limité à 20. Cette limite ne posera pas 
-            problème pour ce projet.
+    /* set mesh configuration */
+    ESP_ERROR_CHECK(esp_mesh_set_config(&cfg));
+    /* mesh start */
+    ESP_ERROR_CHECK(esp_mesh_start());
+}
+            \end{minted}
+            On remarque que nous désactivons le serveur DHCP. En effet, la racine étant la passerelle entre 
+            le réseau \espmesh\ et l'extérieur, elle est la seule à avoir besoin d'une adresse IP.
+            Le serveur DHCP sera activé sur la racine une fois celle-ci élue.
+            Ensuite le \wifi\ est initialisé ainsi que le réseau \espmesh, pour enfin démarrer ce dernier.
+        \item \textbf{\underline{Communications internes}}\\
+            La deuxième étape a été de faire communiquer ses deux noeuds. Nous avons donc envoyer des
+            messages \espmesh\ de la feuille vers la racine.
+            Pour repérer plus facilement les paquets \espmesh\ dans Wireshark, nous avons envoyé
+            20 fois $238$ ce qui vaut $EE$ en hexadécimal.
+            Une fois l'évènement MESH\_EVENT\_PARENT\_CONNECTED détecté, les communications sont initialisées
+            en fonction que le noeud soit la racine ou non. Nous obtenons cette infrmation via \textbf{{esp\_mesh\_is\_root()}}
+            \begin{itemize}
+                \item Pour la racine: Le serveur DHCP et une tâche FreeRTOS (créer via \textbf{{xTaskCreate()}})
+                sont démarrés. Cette tâche écoute en permanance les paquets \espmesh\ qui sont destinés au noeud via la méthode
+                \textbf{{esp\_mesh\_recv()}}.
+                \item Pour les autres types de noeuds du réseau, une tâche FreeRTOS est démarrée. Cette tâche envoie continuellement
+                des paquets \espmesh\ contenant 20 fois EE comme données à la racine. Cet envoi ce fait via la méthode
+                \textbf{{esp\_mesh\_send()}}.\todo{ref à un code ?}
+            \end{itemize}
+            Analysons les communications:\\
+            \todo{analyse des comms}\\
         
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Prochaines étapes}
-        \begin{enumerate}
-            \item Nous allons créer un réseau \espmesh. Ceci nous permettra de nous
-            familiariser avec l'environnement \textit{IDF}.
-            \item Nous évaluerons les performances et fonctionnalités de ce protocole.
-            \item Nous implémenterons un protocole de routage mesh choisis plus haut.
-            \item L'objectif est de l'implémenter au niveau de la couche liaison de données.
-                Si nous rencontrons trop de difficulté ou que nous jugeons que ce 
-                choix n'est pas judicieux, nous implémenterons ce protocole au niveau 
-                de la couche réseau.
-            \item Nous étudierons les différentes possibilités d'économies d'énergie
-            \item Nous évaluerons les performances et fonctionnalités du prorotype créé. 
+        \item \textbf{\underline{Communications externes}}\\
+            \todo{\~\ extérieur}\\
+            Comme nous l'avons déja dit plus haut, la racine joue le rôle de passerelle entre le réseau \espmesh\ 
+            et l'extérieur. Lorsqu'elle reçoit des données pour l'extérieur, elle va initier une communication avec l'adresse
+            de destination via des socket. L'implémentation de la couche IP avec IDF est lwIP (lightweight IP). lwIP est
+            une implémentation légère de la couche IP adaptée aux systèmes embarqués. Pour nous familiariser à l'utilisation
+            de socket avec lwIP, nous avons d'abord réaliser une communication TCP entre un \esp\ et un Raspberry pi utilisé
+            comme serveur.
+            \begin{minted}[xleftmargin=\parindent,linenos]{c}
+void mySend(){
+
+    /* set dest addr */
+    struct sockaddr_in destAddr;
+    destAddr.sin_addr.s_addr = inet_addr(DEST_ADDR);
+    destAddr.sin_port = htons(DEST_PORT);
+    destAddr.sin_family = AF_INET;
+
+    /* set src addr */
+    struct sockaddr_in srcAddr;
+    srcAddr.sin_port = htons(SRC_PORT);
+    srcAddr.sin_family = AF_INET;
+    //get station info
+    tcpip_adapter_ip_info_t ipInfo;
+    esp_err_t r = tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);
+    //set srcAddr IP to station IP
+    memcpy((u32_t *) &srcAddr.sin_addr, &ipInfo.ip.addr, 
+        sizeof(ipInfo.ip.addr));
+
+    /* create TCP socket */
+    int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+
+    /* bind socket to srcAddr */
+    bind(sock, (struct sockaddr *)&srcAddr, sizeof(srcAddr))
+
+    /* connect socket to destAddr */
+    connect(sock, (struct sockaddr *) &destAddr, sizeof(destAddr))
+
+    /* send data */
+    send(sock, payload, sizeof(payload), 0)
+}
+            \end{minted}
+
+            Tout d'abord, nous créons les adresses sources et destinations. Comme la source sera notre \esp,
+            nous récupérons son adresse IP via \textbf{tcpip\_adapter\_get\_ip\_info()} auquel nous demandons
+            les informations de l'interface station. Ensuite, nous pouvons créer un socket, le lier à l'adresse
+            source et enfin le connecter à la destination pour pouvoir envoyer des données. \todo{fichier logs wireshark}
+
             
-        \end{enumerate}
+            Ensuite nous avons rajouter la possibilité pour les noeuds du réseau \espmesh\ d'envoyer des paquets vers l'extérieur.
+            Lorsqu'un message destiné à une adresse IP externe est reçu par la racine, il est récupéré via la fonction
+            \textbf{esp\_mesh\_recv\_toDS()}. Nous devons ensuite créer un socket TCP avec comme adresse source, celle de la racine
+            et comme adresse destination, celle spécifié dans le paquet \espmesh\ reçu par la racine.
+            Voici l'extrait de code qui nous intéresse:
+            \begin{minted}[xleftmargin=\parindent,linenos]{c}
+mesh_addr_t mesh_to_addr;
+struct sockaddr_in ip_to_addr;
+
+err = esp_mesh_recv_toDS(&mesh_from_addr, &mesh_to_addr, &mesh_data, 
+    timeout, &flag, NULL, 0);
+
+memcpy((u32_t *) &ip_to_addr.sin_addr, &mesh_to_addr.mip.ip4.addr,
+    sizeof(mesh_to_addr.mip.ip4.addr));
+/*create, bind and connect socket*/
+sock_error = send(sock, mesh_data.data, mesh_data.size, 0);
+                
+            \end{minted}
+            Une difficulté a été la ligne 7 car il a fallu connaître le type de l'adresse IP du paquet \espmesh\ 
+            ainsi que celui de l'adresse de \textit{sockaddr\_in}.
+
+            \todo{SOCKET SELECT}
+        
+        \item \textbf{\underline{Extension à Wireshark}}\\
+        
+    \end{enumerate}
+
+    \section{ESP-NOW}
+        Le driver Wi-Fi d'\textit{IDF} ne nous permet pas d'avoir une connexion avec plusieurs noeuds simultanément. 
+        \espnow\ est une solution qui palie à ce problème.\\

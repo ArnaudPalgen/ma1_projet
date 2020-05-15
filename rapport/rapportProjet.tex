@@ -9,17 +9,21 @@
 \usepackage{cite}
 \usepackage{microtype}
 \usepackage{makecell}
-\usepackage{hyperref}
 \usepackage{tikz}
 \usepackage{qtree}
 \usepackage{newfloat}
 \usepackage{moreverb}
 \usepackage[T1]{fontenc}
 %\usepackage[dvips]{hyperref}
+
+\usepackage{hyperref}
 \hypersetup{
 colorlinks=true,
 linkcolor=red,           
 }
+\usepackage[outputdir=out]{minted}
+
+\usepackage{pgf-umlsd}
 %\setcounter{tocdepth}{5} %pour l'apparition dans la table des matières des susubsections
 %\setcounter{secnumdepth}{5}%pour la numérotation dans le corps du document des susubsections
 
@@ -31,6 +35,7 @@ linkcolor=red,
 \newcommand{\espnow}{\textsc{esp now}}
 \newcommand{\wifi}{Wi-Fi}
 \newcommand{\aodv}{\textsc{aodv}}
+\newcommand{\todo}[1]{\textcolor{ForestGreen}{\textbf{TODO: #1}}}
 
 \DeclareFloatingEnvironment[fileext=lod]{diagram}
 

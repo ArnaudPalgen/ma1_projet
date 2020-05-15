@@ -1,0 +1,24 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kt}{void} \PYG{n+nf}{app\PYGZus{}main}\PYG{p}{(}\PYG{k+kt}{void}\PYG{p}{)\PYGZob{}}
+    \PYG{c+cm}{/* stop DHCP server for softAP and station interfaces */}
+    \PYG{n}{ESP\PYGZus{}ERROR\PYGZus{}CHECK}\PYG{p}{(}\PYG{n}{tcpip\PYGZus{}adapter\PYGZus{}dhcps\PYGZus{}stop}\PYG{p}{(}\PYG{n}{TCPIP\PYGZus{}ADAPTER\PYGZus{}IF\PYGZus{}AP}\PYG{p}{));}
+    \PYG{n}{ESP\PYGZus{}ERROR\PYGZus{}CHECK}\PYG{p}{(}\PYG{n}{tcpip\PYGZus{}adapter\PYGZus{}dhcpc\PYGZus{}stop}\PYG{p}{(}\PYG{n}{TCPIP\PYGZus{}ADAPTER\PYGZus{}IF\PYGZus{}STA}\PYG{p}{));}
+
+    \PYG{c+cm}{/* wifi initialisation */}
+    \PYG{n}{wifi\PYGZus{}init\PYGZus{}config\PYGZus{}t} \PYG{n}{config} \PYG{o}{=} \PYG{n}{WIFI\PYGZus{}INIT\PYGZus{}CONFIG\PYGZus{}DEFAULT}\PYG{p}{();}
+    \PYG{n}{ESP\PYGZus{}ERROR\PYGZus{}CHECK}\PYG{p}{(}\PYG{n}{esp\PYGZus{}wifi\PYGZus{}init}\PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n}{config}\PYG{p}{));}
+    \PYG{n}{ESP\PYGZus{}ERROR\PYGZus{}CHECK}\PYG{p}{(}\PYG{n}{esp\PYGZus{}wifi\PYGZus{}start}\PYG{p}{());}
+    \PYG{c+cm}{/*  mesh initialisation*/}
+    \PYG{n}{ESP\PYGZus{}ERROR\PYGZus{}CHECK}\PYG{p}{(}\PYG{n}{esp\PYGZus{}mesh\PYGZus{}init}\PYG{p}{());}
+    \PYG{n}{mesh\PYGZus{}cfg\PYGZus{}t} \PYG{n}{cfg} \PYG{o}{=} \PYG{n}{MESH\PYGZus{}INIT\PYGZus{}CONFIG\PYGZus{}DEFAULT}\PYG{p}{();}
+    \PYG{c+cm}{/* event handler */}
+    \PYG{n}{cfg}\PYG{p}{.}\PYG{n}{event\PYGZus{}cb} \PYG{o}{=} \PYG{o}{\PYGZam{}}\PYG{n}{mesh\PYGZus{}event\PYGZus{}handler}\PYG{p}{;}
+
+            \PYG{c+cm}{/* ... */}
+
+    \PYG{c+cm}{/* set mesh configuration */}
+    \PYG{n}{ESP\PYGZus{}ERROR\PYGZus{}CHECK}\PYG{p}{(}\PYG{n}{esp\PYGZus{}mesh\PYGZus{}set\PYGZus{}config}\PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n}{cfg}\PYG{p}{));}
+    \PYG{c+cm}{/* mesh start */}
+    \PYG{n}{ESP\PYGZus{}ERROR\PYGZus{}CHECK}\PYG{p}{(}\PYG{n}{esp\PYGZus{}mesh\PYGZus{}start}\PYG{p}{());}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

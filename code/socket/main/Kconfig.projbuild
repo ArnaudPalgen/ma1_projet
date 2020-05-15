@@ -1,0 +1,15 @@
+menu "SOCKET CONFIGURATION"
+
+    config ROUTER_SSID
+        string "Router SSID"
+        default "ROUTER_SSID"
+        help
+            Router SSID.
+
+    config ROUTER_PASSWD
+        string "Router password"
+        default "ROUTER_PASSWD"
+        help
+            Router password.
+
+endmenu
