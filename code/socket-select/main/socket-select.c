@@ -16,18 +16,19 @@
 
 static const char *TAG = "SOCKET-SELECT";
 
-#define DEST_ADDR "192.168.0.100"
+//#define DEST_ADDR "192.168.0.100"
 #define DEST_ADDR_B "192.168.0.102"
 
-#define PORT_A 5005
-#define PORT_B 5006
+//#define PORT_A 5005
+#define PORT_B 5002
 #define PORT 5001
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 fd_set set;
 
-int sockA, sockB;
+int sockA =-1;
+int sockB;
 
 static int retry = 0;
 #define max_retry 5
@@ -89,12 +90,12 @@ void receive(void *arg){
 void envoi(void *arg){
     FD_ZERO(&set);//vide l'ensemble
 
-    static const char *payloadA = "Hello Home!A";
+    //static const char *payloadA = "Hello Home!A";
     static const char *payloadB = "Hello Home!B";
     
     /* src and dest IP addr */
     struct sockaddr_in ip_from_addr;
-    struct sockaddr_in ip_to_addrA;
+    //struct sockaddr_in ip_to_addrA;
     struct sockaddr_in ip_to_addrB;
 
     /* from addr */
@@ -110,9 +111,9 @@ void envoi(void *arg){
     ip_from_addr.sin_family = AF_INET;
 
     /* to addrA */
-    ip_to_addrA.sin_family = AF_INET;
-    ip_to_addrA.sin_addr.s_addr = inet_addr(DEST_ADDR);
-    ip_to_addrA.sin_port = htons(PORT_A);
+    //ip_to_addrA.sin_family = AF_INET;
+    //ip_to_addrA.sin_addr.s_addr = inet_addr(DEST_ADDR);
+    //ip_to_addrA.sin_port = htons(PORT_A);
 
     /* to addrB */
     ip_to_addrB.sin_family = AF_INET;
@@ -126,14 +127,16 @@ void envoi(void *arg){
 
 
     /* socket A */
-    sockA = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+    /*sockA = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 
     if(sockA < 0){
         ESP_LOGE(TAG, "unable to create socket A");
     }
     ESP_LOGI(TAG, "socket A created");
 
+    ESP_LOGE(TAG, "size before: %d",sizeof(set));
     FD_SET(sockA, &set); // ajout du socket dans l'ensemble
+    ESP_LOGE(TAG, "size after: %d",sizeof(set));
 
     err = bind(sockA, (struct sockaddr *)&ip_from_addr, sizeof(ip_from_addr));
     if(err < 0){
@@ -148,7 +151,7 @@ void envoi(void *arg){
     if(err < 0){
         ESP_LOGE(TAG, "unable to send with socket A");
     }
-    vTaskDelay(xDelay);
+    vTaskDelay(xDelay);*/
 
     
     /* socket B */
@@ -158,9 +161,16 @@ void envoi(void *arg){
         ESP_LOGE(TAG, "unable to create socket B");
     }
     ESP_LOGI(TAG, "socket B created");
-
+    
+    ESP_LOGE(TAG, "size before: %d",sizeof(set));
     FD_SET(sockB, &set); // ajout du socket dans l'ensemble
-
+    ESP_LOGE(TAG, "size after: %d",sizeof(set));
+    int size = sizeof(set.fd_bits)/sizeof(unsigned char);
+    for(int i=0;i<size;i++){
+        printf("%d, ", set.fd_bits[i]);
+    }
+    printf("\n");
+    
     int flag = 1;
     setsockopt(sockB, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
     err = bind(sockB, (struct sockaddr *)&ip_from_addr, sizeof(ip_from_addr));
@@ -182,14 +192,14 @@ void envoi(void *arg){
     vTaskDelay(xDelay);
 
     while(1){
-        err = sendto(sockA, payloadA, sizeof(payloadA), 0, (struct sockaddr *)&ip_to_addrA, sizeof(ip_to_addrA));
-        vTaskDelay(xDelay);
+        //err = sendto(sockA, payloadA, sizeof(payloadA), 0, (struct sockaddr *)&ip_to_addrA, sizeof(ip_to_addrA));
+        //vTaskDelay(xDelay);
         err = sendto(sockB, payloadB, sizeof(payloadB), 0, (struct sockaddr *)&ip_to_addrB, sizeof(ip_to_addrB));
         vTaskDelay(xDelay);
     }
 
-    shutdown(sockA, 0);
-    close(sockA);
+    //shutdown(sockA, 0);
+    //close(sockA);
     shutdown(sockB, 0);
     close(sockB);
     vTaskDelete(NULL);

@@ -42,9 +42,7 @@ struct record{
 
 static struct record* matching_table[MATCHING_TABLE_SIZE]; // on autorise 10 sockets max
 
-static fd_set readSet;
-
-static int maxSock = 0;
+//static int maxSock = 0;
 
 u32_t *myIP=NULL;
 
@@ -141,6 +139,65 @@ void esp_mesh_internal_rx(void *arg){
     vTaskDelete(NULL);// delete the task
 }
 
+//recoit depuis externe pour interne
+//for root
+void esp_mesh_external_rx(void *arg){//receive
+    
+    uint8_t rx_buf[RX_BUF_SIZE]={0,}; // buffer
+    int recv_value, sock;
+    bool is_running = true;
+    struct sockaddr_in src;
+    socklen_t sockLen;
+    
+    /* initializes the set of descriptors */
+    static fd_set readSet;
+    FD_ZERO(&readSet);
+
+    int maxSock=-1;
+    int listenSock=NULL;
+
+    while(is_running){
+        FD_ZERO(&readSet);
+        for(int i=0; i<MATCHING_TABLE_SIZE; i++){
+            if(matching_table[i]==NULL){
+                break;
+            }
+            listenSock=matching_table[i]->sock;
+            FD_SET(listenSock,&readSet);
+            if(listenSock > maxSock || maxSock==-1){
+                maxSock = listenSock;
+            }
+        }
+
+        if(select(maxSock+1, &readSet, NULL, NULL, NULL) < 0){
+            ESP_LOGE(TAG, "select error");
+        }
+        for(int i=0; i<MATCHING_TABLE_SIZE; i++){
+            if(matching_table[i]==NULL){
+                break;
+            }
+            sock = matching_table[i]->sock;
+            if(FD_ISSET(sock, &readSet)){
+                recv_value = recvfrom(sock, rx_buf, sizeof(rx_buf), 0, &src, &sockLen);
+                if(recv_value == 0){
+                    ESP_LOGI(TAG, "socket %d closed by peer", sock);
+                    shutdown(sock, 0);
+                    close(sock);
+                    FD_CLR(sock, &readSet);
+                }else if(recv_value < 0){
+                    ESP_LOGE(TAG, "recv error");
+                }else{
+                    ESP_LOGI(TAG, "receveid %d bytes to port %d", recv_value, htons(src.sin_port));//n'affiche pas le bon port faire +1024 ? 
+                    printData(rx_buf, recv_value);
+
+                    
+                }
+            }
+        }
+    }
+
+}
+
 //recoit depuis interne et retransmet vers externe
 //for root
 void esp_mesh_external_tx(void *arg){//send
@@ -181,6 +238,8 @@ void esp_mesh_external_tx(void *arg){//send
     int flag = 0;
 
     bool is_running = true;
+    
+    TaskHandle_t xHandle = NULL;
     
 
     while(is_running){
@@ -246,10 +305,12 @@ void esp_mesh_external_tx(void *arg){//send
                 close(sock);
                 break;
             }
-            if(sock > maxSock){
+            /*if(sock > maxSock){
                 maxSock = sock;
-            }
-            FD_SET(sock, &readSet);// add sock to readSet
+            }*/
+            //ESP_LOGE(TAG, "size before: %d",sizeof(readSet));
+            //FD_SET(sock, &readSet);// add sock to readSet
+            //ESP_LOGE(TAG, "size after: %d",sizeof(readSet));
             //##########################################
             if(sock < 0){
                 continue;
@@ -260,6 +321,10 @@ void esp_mesh_external_tx(void *arg){//send
             item->addr = mesh_from_addr.addr;
             matching_table[currentPort-MIN_PORT] = item;
             currentPort++;
+            if(xHandle !=NULL){
+                vTaskDelete(xHandle);
+            }
+            xTaskCreate(esp_mesh_external_rx, "ERX", 3072, NULL, 5, &xHandle);
         }
         err = send(item->sock, mesh_data.data, mesh_data.size, 0);
         if(err < 0){
@@ -271,54 +336,6 @@ void esp_mesh_external_tx(void *arg){//send
         
     }
     vTaskDelete(NULL);
-}
-
-//recoit depuis externe pour interne
-//for root
-void esp_mesh_external_rx(void *arg){//receive
-    
-    uint8_t rx_buf[RX_BUF_SIZE]={0,}; // buffer
-    int recv_value, sock;
-    bool is_running = true;
-    struct sockaddr_in src;
-    socklen_t sockLen;
-    ESP_LOGE(TAG, "R1: %d",sizeof(readSet));
-
-    while(is_running){
-        ESP_LOGE(TAG, "R1B");
-        if(select(maxSock, &readSet, NULL, NULL, NULL) < 0){
-            ESP_LOGE(TAG, "select error");
-        }
-        ESP_LOGE(TAG, "R1C");
-        for(int i=0; i<MATCHING_TABLE_SIZE; i++){
-            if(matching_table[i]==NULL){
-                break;
-            }
-            sock = matching_table[i]->sock;
-            if(FD_ISSET(sock, &readSet)){
-                ESP_LOGE(TAG, "R2");
-                recv_value = recvfrom(sock, rx_buf, sizeof(rx_buf), 0, &src, &sockLen);
-                ESP_LOGE(TAG, "R3");
-                if(recv_value == 0){
-                    ESP_LOGE(TAG, "R4");
-                    ESP_LOGI(TAG, "socket %d closed by peer", sock);
-                    shutdown(sock, 0);
-                    close(sock);
-                    FD_CLR(sock, &readSet);
-                }else if(recv_value < 0){
-                    ESP_LOGE(TAG, "R5");
-                    ESP_LOGE(TAG, "recv error");
-                }else{
-                    ESP_LOGE(TAG, "R6");
-                    ESP_LOGI(TAG, "receveid %d bytes for port %d", recv_value, src.sin_port);
-                    printData(rx_buf, recv_value);
-                    
-                    
-                }
-            }
-        }
-    }
-
 }
 
 void start_p2p_comm(void){
@@ -341,7 +358,7 @@ void start_external_comm(void){
 
     if (!is_comm_external_started && esp_mesh_is_root()) {
         is_comm_external_started = true;
-        xTaskCreate(esp_mesh_external_rx, "ERX", 3072, NULL, 5, NULL);
+        //xTaskCreate(esp_mesh_external_rx, "ERX", 3072, NULL, 5, NULL);
         xTaskCreate(esp_mesh_external_tx, "ETX", 3072, NULL, 5, NULL);
     }
 }
@@ -490,9 +507,6 @@ void app_main(void){
 
     /*  tcpip initialization */
     tcpip_adapter_init();
-
-    /* initializes the set of descriptors */
-    FD_ZERO(&readSet);
     
     /* stop DHCP server for softAP and station interfaces */
     ESP_ERROR_CHECK(tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_AP));
@@ -536,3 +550,9 @@ void app_main(void){
     ESP_ERROR_CHECK(esp_mesh_start());
 
 }
+
+/*
+00172   typedef struct fd_set {
+00173           unsigned char fd_bits [(FD_SETSIZE+7)/8];
+00174         } fd_set;
+*/
