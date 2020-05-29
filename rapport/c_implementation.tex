@@ -67,7 +67,96 @@ void app_main(void){
             On remarque que nous désactivons le serveur DHCP. En effet, la racine étant la passerelle entre 
             le réseau \espmesh\ et l'extérieur, elle est la seule à avoir besoin d'une adresse IP.
             Le serveur DHCP sera activé sur la racine une fois celle-ci élue.
-            Ensuite le \wifi\ est initialisé ainsi que le réseau \espmesh, pour enfin démarrer ce dernier.
+            Ensuite le \wifi\ est initialisé ainsi que le réseau \espmesh, pour enfin démarrer ce dernier.\\
+            Analysons la construction du réseau avec 2 noeuds:\\
+            \begin{minted}[xleftmargin=\parindent,linenos]{console}
+I (1479) mesh: <MESH_NWK_LOOK_FOR_NETWORK>need_scan:0x1, 
+    need_scan_router:0x0, look_for_nwk_count:1
+I (1779) mesh: [FIND][ch:7]AP:0, otherID:0, MAP:0, idle:0, 
+    candidate:0, root:0[00:00:00:00:00:00]
+I (1779) mesh: [FIND:1]fail to find a network, channel:0, 
+    cfg<channel:7, router:MyRouter, 00:00:00:00:00:00>
+
+I (1789) mesh: <MESH_NWK_LOOK_FOR_NETWORK>need_scan:0x3, 
+    need_scan_router:0x1, look_for_nwk_count:2
+I (1919) mesh: [S1]MyRouter, 1a:b2:c3:d4:e5:f6, channel:7, rssi:-43
+I (1919) mesh: find router:[ssid_len:13]MyRouter, rssi:-43, 
+    1a:b2:c3:d4:e5:f6(encrypted), new channel:7, old channel:0
+I (1929) mesh: [FIND][ch:7]AP:1, otherID:0, MAP:0, idle:0, candidate:0, 
+    root:0[1a:b2:c3:d4:e5:f6]router found<scan router>
+I (1939) mesh: [FIND:2]find a network, channel:7, cfg<channel:7, 
+    router:MyRouter, 00:00:00:00:00:00>
+
+I (1949) wifi: mode : sta (3c:71:bf:0d:83:08) + softAP (3c:71:bf:0d:83:09)
+I (2269) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1,
+    candidate:1,root:0, topMAP:0[c:1,i:1][1a:b2:c3:d4:e5:f6]router found<>
+I (2269) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:4,
+    2nd_layer_count:0
+I (2279) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:1d,-120]
+I (2279) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:1d,-120]
+I (2289) mesh: 1250, vote myself, router rssi:-45 > voted rc_rssi:-120
+I (2299) mesh: [SCAN:1/10]rc[128][3c:71:bf:0d:83:09,-45], 
+    self[3c:71:bf:0d:83:08, -45,reason:0,votes:1,idle]
+        [mine:1,voter:1(1.00)percent:0.90][128,1,3c:71:bf:0d:83:09]
+
+                            ....
+I (8049) mesh: [SCAN:10/10]rc[128][3c:71:bf:0d:83:09,-45], 
+    self[3c:71:bf:0d:83:08,-39,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]
+
+I (8069) mesh: [DONE]connect to router:Sitecom0BD453, channel:7,
+    rssi:-39, 64:d1:a3:0b:d4:53[layer:0, assoc:0], my_vote_num:2/voter_num:2, rc[3c:71:bf:0d:83:09/-45/1]
+                            
+
+            \end{minted}
+            On remarque d'abord que le noeud cherche un réseau \espmesh. Comme il n'en trouve pas,
+            il va chercher un point d'accès. Il trouve le point d'accès \textit{"MyRouter"} qui est sur 
+            le canal 7 et avec lequelil a un \rssi\ de -43. Ensuite il écoute les beacons
+            des autres noeuds. On remarque bien qu'il détecte un autre noeud idle.
+            Ensuite le vote commence à la ligne 19. À chaque itération du vote, le noeud
+            écoute les beacons des autres noeuds. Ici il en détecte un autre noeud idle qui a un \rssi
+            avec le routeur de -120. Comme $-45 > -120$, il va voter pour lui-même. Ce qui veut dire émettre
+            un beacon avec ses informations. Si son \rssi\ était moins fort que celui de l'autre noeud, 
+            il aurait émis un beacon avec les informations de l'autre noeud. Ce que nous avons décrit ici
+            correspond à une itération du vote. Dans notre cas il y aura 10 itérations. Ce nombre est un paramètre
+            tu réseau \espmesh. A la fin des 10 itérations, le noeud compare son ratio au seuil (ici de 0.90).
+            Comme ce ratio ( ici 1) est plus grand que le seuil, le noeud devient la racine du réseau \espmesh\ et 
+            se connecte au routeur.
+            Ses observations correspondent bien à la description du protocole faite plus haut.
+
+            Nous avons également observer la construction du réseau avec Wireshark. On remarque bien cet échange
+            de beacons. Voici un exemple du contenu d'un beacon:\\
+            \begin{alltt}
+0000 00 00 1a 00 2f 48 00 00 27 b3 bb 07 00 00 00 00
+0010 10 02 8a 09 a0 00 de 00 00 00 \textcolor{red}{80 00 00 00 ff ff
+0020 ff ff ff ff 3c 71 bf 0d 83 09 3c 71 bf 0d 83 09
+0030 10 00} db 9c 01 00 00 00 00 00 64 00 21 04 00 00
+0040 01 08 8b 96 82 84 0c 18 30 60 03 01 07 05 05 01
+0050 02 00 00 00 07 06 43 4e 00 01 0d 14 2a 01 00 32
+0060 04 6c 12 24 48 2d 1a 6e 11 00 ff 00 00 00 00 00
+0070 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 00
+0080 00 3d 16 07 05 00 00 00 00 00 00 00 00 00 00 00
+0090 00 00 00 00 00 00 00 00 00 dd 18 00 50 f2 02 01
+00a0 01 04 00 03 a4 00 00 27 a4 00 00 42 43 5e 00 62
+00b0 32 2f 00 \textcolor{blue}{dd 45 18 fe 34 01 02 00 77 77 77 77 77
+00c0 77 19 00 04 00 00 00 00 00 00 00 00 00 00 00 88
+00d0 88 00 00 00 00 00 00 00 88 00 00 00 00 00 00 88
+00e0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0a
+00f0 00 00 00 0f 00 00 5f 8a d2 40 dd 16 18 fe 34 06
+0100 02 00 0b 45 53 50 4d 5f 30 44 38 33 30 38 cd 20
+0110 f9 23 dd 15 18 fe 34 0c 02 00 00 00 00 00 00 6d
+0120 ef a8 4d 99 5c 80 b0 d2 d3} a1 d2 b2 10
+            \end{alltt}
+
+            En rouge, nous avons l'entête 802.11 et en bleu les paramètres supplémentaires
+            d'Espressif pour le réseau \espmesh.
+            Dans l'entête 802.11, on remarque l'adresse de destination qui est l'adresse Broadcast
+            ainsi que l'adresse source qui est celle du noeud qui a émis ce beacon.
+            Dans les paramètres supplémentaires, nous avons seulement distinguer l'id du réseau
+            \espmesh\ qui est 77 77 77 77 77 77. 
+            
+
+        
+
         \item \textbf{\underline{Communications internes}}\\
             La deuxième étape a été de faire communiquer ses deux noeuds. Nous avons donc envoyer des
             messages \espmesh\ de la feuille vers la racine.
@@ -81,19 +170,123 @@ void app_main(void){
                 \textbf{{esp\_mesh\_recv()}}.
                 \item Pour les autres types de noeuds du réseau, une tâche FreeRTOS est démarrée. Cette tâche envoie continuellement
                 des paquets \espmesh\ contenant 20 fois EE comme données à la racine. Cet envoi ce fait via la méthode
-                \textbf{{esp\_mesh\_send()}}.\todo{ref à un code ?}
+                \textbf{{esp\_mesh\_send()}}.
             \end{itemize}
+            Voici un extrait du code réalisant ce que nous venons d'expliquer:
+            \begin{minted}[xleftmargin=\parindent,linenos]{c}
+void esp_mesh_rx(void *arg){
+    esp_err_t err;
+    uint8_t rx_buf[RX_BUF_SIZE]={0,}; //receive buffer
+    mesh_addr_t from; //src addr
+    int flag = 0;
+    
+    /* mesh data */
+    mesh_data_t data;
+    data.data = rx_buf;
+    data.size = sizeof(rx_buf);
+
+    while(){
+        /* recv
+         *  - from addr
+         *  - data
+         *  - timeout in ms (0:no wait, portMAX_DELAY:wait forever)
+         *  - flag
+         *  - options
+         *  - number of options
+         **/
+        err = esp_mesh_recv(&from, &data, 5000, &flag, NULL, 0);
+        if(err == ESP_OK){
+            printArray(rx_buf, RX_BUF_SIZE);
+        }
+    }
+    /* delete the task */
+    vTaskDelete(NULL); 
+}
+void esp_mesh_tx(void *arg){
+    esp_err_t err;
+
+    static uint8_t tx_buf[TX_BUF_SIZE]= {238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238};
+    
+    /* mesh data */
+    mesh_data_t mesh_data;
+    mesh_data.data = tx_buf;
+    mesh_data.size = sizeof(tx_buf);
+    mesh_data.proto = MESH_PROTO_BIN;
+
+    while(){
+        /* send:
+         *  - dest addr
+         *  - data: NULL for the root
+         *  - flag
+         *  - options
+         *  - number of options
+         **/
+        err = esp_mesh_send(NULL, &mesh_data, 0, NULL, 0);
+    }
+    /* delete the task */
+    vTaskDelete(NULL);
+}
+void esp_mesh_comm_p2p_start(){
+    static bool p2p_started = false;
+    if(!p2p_started){
+        if(esp_mesh_is_root()){// root node
+            xTaskCreate(esp_mesh_rx, "MPRX", 3072, NULL, 5, NULL);       
+        }else{// intermediate or leaf node
+            xTaskCreate(esp_mesh_tx, "MPTX", 3072, NULL, 5, NULL);
+        }
+    }
+}
+
+void mesh_event_handler(mesh_event_t event){
+    if (event.id == MESH_EVENT_PARENT_CONNECTED){
+        if (esp_mesh_is_root()) {
+            /* start DHCP server for the root node */
+            tcpip_adapter_dhcpc_start(TCPIP_ADAPTER_IF_STA);
+        }
+        esp_mesh_comm_p2p_start();
+    }
+}
+            \end{minted}
             Analysons les communications:\\
-            \todo{analyse des comms}\\
-        
+            Grâce aux données que nous avons choisies d'envoyer, nous avons repérer facilement
+            les paquets avec lequels ces données sont envoyées. Pour cet exemple de paquet,
+            nous avons utilisé 3 noeuds: La racine, un noeud intermédiaire et une feuille.
+            La feuille envoie un paquet à la racine.
+            \begin{alltt}
+0000   00 00 1a 00 2f 48 00 00 b0 23 e1 04 00 00 00 00
+0010   10 02 8a 09 a0 00 e2 00 00 00 \textcolor{red}{88 01 3a 01 3c 71
+0020   bf 0d 83 09 3c 71 bf 0d 7e 18 3c 71 bf 0d 83 09
+0030   50 00 00 00} \textcolor{ForestGreen}{aa aa 03 18 fe 34 ee ee} \textcolor{blue}{21 07 30 00
+0040   31 04 40 01 00 00 00 00 00 00 3c 71 bf 0d 7e 18
+0050   02 00 00 00 02 00 00 00 ee ee ee ee ee ee ee ee
+0060   ee ee ee ee ee ee ee ee ee ee ee ee} f8 5e 65 af
+                
+            \end{alltt}
+            En rouge nous avons l'entête 802.11 où nous pouvons distinguer les adresses
+            \mac\ du noeud source et du noeud de destination.
+            En vert, Nous trouvons la couche \todo{bof} \textsc{llc} (logical link control)
+            qui agit comme interface entre la couche \mac\ et la couche réseau.
+            Enfin en bleu, le paquet \espmesh\ contenant:
+            \begin{itemize}
+                \item 8 octets que nous supposons être utilisés pour des options
+                \item 6 octets utilisés pour l'adresse de destination (cette adresse est celle
+                utilisée pour la racine du réseauenumerate).
+                \item 6 octets utilisés pour l'adresse source
+                \item 8 octets que nous supposons être utilisés pour des options
+                \item 20 octets utilisés pour notre payload
+            \end{itemize}
+            La taille maximale du payload (\textsc{mps}) est de 1472 octets. Le total nous donne donc 1500
+            octets ce qui correspond bien au \textsc{mtu} défini pour \espmesh.
+            \footnote{Les constantes MTU et MPS sont définies dans le fichier \textbf{esp\_mesh.h}}
+ 
         \item \textbf{\underline{Communications externes}}\\
             \todo{\~\ extérieur}\\
             Comme nous l'avons déja dit plus haut, la racine joue le rôle de passerelle entre le réseau \espmesh\ 
             et l'extérieur. Lorsqu'elle reçoit des données pour l'extérieur, elle va initier une communication avec l'adresse
             de destination via des socket. L'implémentation de la couche IP avec IDF est lwIP (lightweight IP). lwIP est
             une implémentation légère de la couche IP adaptée aux systèmes embarqués. Pour nous familiariser à l'utilisation
-            de socket avec lwIP, nous avons d'abord réaliser une communication TCP entre un \esp\ et un Raspberry pi utilisé
-            comme serveur.
+            de socket avec lwIP, nous avons d'abord réalisé une communication TCP entre un \esp\ et un Raspberry pi utilisé
+            comme serveur. Voici un extrait de code: 
             \begin{minted}[xleftmargin=\parindent,linenos]{c}
 void mySend(){
 
@@ -130,8 +323,8 @@ void mySend(){
 
             Tout d'abord, nous créons les adresses sources et destinations. Comme la source sera notre \esp,
             nous récupérons son adresse IP via \textbf{tcpip\_adapter\_get\_ip\_info()} auquel nous demandons
-            les informations de l'interface station. Ensuite, nous pouvons créer un socket, le lier à l'adresse
-            source et enfin le connecter à la destination pour pouvoir envoyer des données. \todo{fichier logs wireshark}
+            les informations de l'interface \textit{station}. Ensuite, nous pouvons créer un socket, le lier à l'adresse
+            source et enfin le connecter à la destination pour pouvoir envoyer des données.
 
             
             Ensuite nous avons rajouter la possibilité pour les noeuds du réseau \espmesh\ d'envoyer des paquets vers l'extérieur.
@@ -163,4 +356,70 @@ sock_error = send(sock, mesh_data.data, mesh_data.size, 0);
 
     \section{ESP-NOW}
         Le driver Wi-Fi d'\textit{IDF} ne nous permet pas d'avoir une connexion avec plusieurs noeuds simultanément. 
+        Nous supposons que c'est pour cette raison qu'\espmesh\ utilise une structure d'arbre et non de graphe.
         \espnow\ est une solution qui palie à ce problème.\\
+        En effet un noeud peut avoir maximum 20 voisins. Ce qui est suffisant pour établir un réseau \mesh\ tel
+        que nous l'envisagons. Par contre comparé à \espmesh, le \textsc{mtu} est plus petit. En effet il est
+        de 250 octets.\footnote{le \textsc{mtu} et le nombre de voisins maximum sont définis dans le fichier
+        \textbf{esp\_now.h}}
+
+        Utilisons \espnow:\\
+        Nous avons utilisés 3 noeuds. Un des noeuds envoie des données en broadcast aux autres.
+        Voici un exrait du code permettant de réalisé ce que nous venons de décrire:
+        \begin{minted}[xleftmargin=\parindent,linenos]{c}
+
+#define ESPNOW_WIFI_MODE WIFI_MODE_STA // Wi-Fi mode: sta, ap or sta+ap
+#define ESPNOW_WIFI_IF ESP_IF_WIFI_STA // Wi-Fi interface sta or ap
+
+static const uint8_t broadcast_addr[ESP_NOW_ETH_ALEN] = 
+    {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data,
+    int data_len){
+    ESP_LOGI(TAG, "receive %d bytes:", data_len);
+    printArray(data, data_len);
+}
+
+void esp_now_tx(void *arg){
+            /* ... */
+    /* create peer broadcast */
+    esp_now_peer_info_t peer;
+    peer.channel = CHANNEL;
+    peer.ifidx = ESPNOW_WIFI_IF;
+    peer.encrypt = false;
+    memcpy(peer.peer_addr, broadcast_addr, ESP_NOW_ETH_ALEN);
+    ESP_ERROR_CHECK(esp_now_add_peer(&peer)); // add peer
+
+    ESP_LOGI(TAG, "send to all nodes");
+    while(is_running){
+        esp_now_send(&broadcast_addr, &data, sizeof(data));
+        vTaskDelay( 1000 / portTICK_PERIOD_MS ); // delay the task
+    }
+    vTaskDelete(NULL); 
+}
+
+void app_main(void){    
+            /* ... */
+    /* Wi-Fi initialization */
+    wifi_init_config_t config = WIFI_INIT_CONFIG_DEFAULT();    
+    ESP_ERROR_CHECK(esp_wifi_init(&config));
+    ESP_ERROR_CHECK(esp_wifi_set_mode(ESPNOW_WIFI_MODE));
+    ESP_ERROR_CHECK(esp_wifi_start());
+    
+    /* ESP-NOW initialization */
+    ESP_ERROR_CHECK(esp_now_init());
+    ESP_ERROR_CHECK(esp_now_register_recv_cb(espnow_recv_cb));
+            /* ... */
+}
+        \end{minted}
+Tout d'abord nous initialisons le driver \wifi. Nous définissions le mode du driver \wifi\ à
+\textit{station}. Cette interface sera utilisée par \espnow. Il est également possible d'utiliser 
+l'interface \textit{acces point}. 
+Ensuite nous définissions la fonction qui sera appellée lorsqu'un paquet \espnow\ est reçu.
+Nous créons ensuite, pour le noeud source, la tâche \textbf{esp\_now\_tx()} qui envoie les données en broadcast.
+Pour cela, nous devons d'abord créer un "voisin" broadcast, pour ensuite envoyer les données vers ce voisin.
+Pour envoyer des données vers un noeud précis, il faut créer un voisin avec l'adresse \mac\ du noeud.
+
+Pour construire un réseau \mesh, il faudrait, par exemple que chaque nouveau noeud émette en broadcast, un paquet \espnow\ 
+contenant au moins son adresse \mac. De cette façons, les noeuds voisins pourraient le rajouter à leurs
+liste de voisins.

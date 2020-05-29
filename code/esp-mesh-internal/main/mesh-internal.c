@@ -9,7 +9,7 @@
 
 #define RX_BUF_SIZE  20
 #define TX_BUF_SIZE  20
-#define NBR_TO_SEND  5 // number of packets to send
+#define NBR_TO_SEND  100 // number of packets to send
 
 static const char *TAG = "mesh_internal";
 static const uint8_t MESH_ID[6] = { 0x77, 0x77, 0x77, 0x77, 0x77, 0x77}; // mesh id
@@ -102,7 +102,7 @@ void esp_mesh_tx(void *arg){
         }else{
             ESP_LOGE(TAG, "data was not sent");
         }
-        vTaskDelay( 500 / portTICK_PERIOD_MS ); // delay of 500 ms
+        vTaskDelay( 1000 / portTICK_PERIOD_MS ); // delay the task
     }
     /* all messages have been sent -> delete the task */
     vTaskDelete(NULL);
@@ -143,7 +143,7 @@ void mesh_event_handler(mesh_event_t event){
 void app_main(void){
     ESP_ERROR_CHECK(nvs_flash_init());
 
-    /* tcpip initialization*/    
+    /* tcpip initialization */
     tcpip_adapter_init();
     
     /* stop DHCP server for softAP and station interfaces */

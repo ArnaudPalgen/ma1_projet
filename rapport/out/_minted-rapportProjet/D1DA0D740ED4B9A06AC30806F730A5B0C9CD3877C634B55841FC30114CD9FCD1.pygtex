@@ -1,0 +1,37 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{g+go}{I (1479) mesh: \PYGZlt{}MESH\PYGZus{}NWK\PYGZus{}LOOK\PYGZus{}FOR\PYGZus{}NETWORK\PYGZgt{}need\PYGZus{}scan:0x1,}
+\PYG{g+go}{    need\PYGZus{}scan\PYGZus{}router:0x0, look\PYGZus{}for\PYGZus{}nwk\PYGZus{}count:1}
+\PYG{g+go}{I (1779) mesh: [FIND][ch:7]AP:0, otherID:0, MAP:0, idle:0,}
+\PYG{g+go}{    candidate:0, root:0[00:00:00:00:00:00]}
+\PYG{g+go}{I (1779) mesh: [FIND:1]fail to find a network, channel:0,}
+\PYG{g+go}{    cfg\PYGZlt{}channel:7, router:MyRouter, 00:00:00:00:00:00\PYGZgt{}}
+
+\PYG{g+go}{I (1789) mesh: \PYGZlt{}MESH\PYGZus{}NWK\PYGZus{}LOOK\PYGZus{}FOR\PYGZus{}NETWORK\PYGZgt{}need\PYGZus{}scan:0x3,}
+\PYG{g+go}{    need\PYGZus{}scan\PYGZus{}router:0x1, look\PYGZus{}for\PYGZus{}nwk\PYGZus{}count:2}
+\PYG{g+go}{I (1919) mesh: [S1]MyRouter, 1a:b2:c3:d4:e5:f6, channel:7, rssi:\PYGZhy{}43}
+\PYG{g+go}{I (1919) mesh: find router:[ssid\PYGZus{}len:13]MyRouter, rssi:\PYGZhy{}43,}
+\PYG{g+go}{    1a:b2:c3:d4:e5:f6(encrypted), new channel:7, old channel:0}
+\PYG{g+go}{I (1929) mesh: [FIND][ch:7]AP:1, otherID:0, MAP:0, idle:0, candidate:0,}
+\PYG{g+go}{    root:0[1a:b2:c3:d4:e5:f6]router found\PYGZlt{}scan router\PYGZgt{}}
+\PYG{g+go}{I (1939) mesh: [FIND:2]find a network, channel:7, cfg\PYGZlt{}channel:7,}
+\PYG{g+go}{    router:MyRouter, 00:00:00:00:00:00\PYGZgt{}}
+
+\PYG{g+go}{I (1949) wifi: mode : sta (3c:71:bf:0d:83:08) + softAP (3c:71:bf:0d:83:09)}
+\PYG{g+go}{I (2269) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1,}
+\PYG{g+go}{    candidate:1,root:0, topMAP:0[c:1,i:1][1a:b2:c3:d4:e5:f6]router found\PYGZlt{}\PYGZgt{}}
+\PYG{g+go}{I (2269) mesh: 1022\PYGZlt{}pre\PYGZgt{}my\PYGZus{}vote\PYGZus{}num:0, voter\PYGZus{}num/max\PYGZus{}connection:4,}
+\PYG{g+go}{    2nd\PYGZus{}layer\PYGZus{}count:0}
+\PYG{g+go}{I (2279) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:1d,\PYGZhy{}120]}
+\PYG{g+go}{I (2279) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:1d,\PYGZhy{}120]}
+\PYG{g+go}{I (2289) mesh: 1250, vote myself, router rssi:\PYGZhy{}45 \PYGZgt{} voted rc\PYGZus{}rssi:\PYGZhy{}120}
+\PYG{g+go}{I (2299) mesh: [SCAN:1/10]rc[128][3c:71:bf:0d:83:09,\PYGZhy{}45],}
+\PYG{g+go}{    self[3c:71:bf:0d:83:08, \PYGZhy{}45,reason:0,votes:1,idle]}
+\PYG{g+go}{        [mine:1,voter:1(1.00)percent:0.90][128,1,3c:71:bf:0d:83:09]}
+
+\PYG{g+go}{                            ....}
+\PYG{g+go}{I (8049) mesh: [SCAN:10/10]rc[128][3c:71:bf:0d:83:09,\PYGZhy{}45],}
+\PYG{g+go}{    self[3c:71:bf:0d:83:08,\PYGZhy{}39,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:83:09]}
+
+\PYG{g+go}{I (8069) mesh: [DONE]connect to router:Sitecom0BD453, channel:7,}
+\PYG{g+go}{    rssi:\PYGZhy{}39, 64:d1:a3:0b:d4:53[layer:0, assoc:0], my\PYGZus{}vote\PYGZus{}num:2/voter\PYGZus{}num:2, rc[3c:71:bf:0d:83:09/\PYGZhy{}45/1]}
+\end{Verbatim}
