@@ -11,14 +11,14 @@
             \cite{esp32-gettingStarted_w}}
         \label{esp32_img}
     \end{figure}
-    Comme dit plus haut, les noeuds de notre réseau seront des \esp.
+    Comme dit plus haut, les noeuds de notre réseau sont des \esp.
     Pour ce projet, nous utilisons un kit de développement (Fig. \ref{esp32_img}) équipé d'un
     \esp\textsc{-wroom32}, développé par Espressif. L'\esp\textsc{-wroom32}
     un System-on-Chip (SoC), c'est à dire un circuit intégré rassemblant plusieurs
     composants comme des entrées/sorties, de la mémoire \textsc{ram}, micorprocesseurs,
     microcontrôleurs, etc.
     %todo prix
-    Il a été choisis pour son faible coût et sa conception adaptée à l'Internet des Objets (IoT). 
+    Il a été choisi pour son faible coût (entre 3.50\euro\ et 4\euro) et sa conception adaptée à l'Internet des Objets (IoT). 
     En effet, en plus de supporter le \wifi\ et le Bluetooth 2.4GHz,
     sa consommation en énergie est faible et il possède des mécanismes permettant de l'économiser. %et il possède plusieurs modes de fonctionnement.
     %permettant de la réduire (voir Table \ref{Consumption_PowerModes}).
@@ -57,8 +57,8 @@
     
     
         \textbf{Gestion de l'énergie}\\
-        Comme dit plus haut, l'\esp\ a une consommation d'énergie faible. De plus il possède plusieurs
-        modes de fonctionnement repris dans la Table \ref{Consumption_PowerModes} permettant de
+        Comme dit plus haut, l'\esp\ a une consommation d'énergie faible. De plus, il possède plusieurs
+        modes de fonctionnement repris dans la Table \ref{Consumption_PowerModes}, permettant de
         la diminuer.
     
     \begin{table}[H]
@@ -106,30 +106,86 @@
         \item \textbf{MicroPython}\\
             Selon le site officiel de MicroPython\cite{micropython_w}, MicroPython
             est une implémentation simple et efficace de Python 3 incluant un
-            petit sous-ensemble de la bibliothèque standard Python et est
-            optimisé pour fonctionner sur des microcontrôleurs.\\
-            MicroPython est open source et facile à utiliser. Cependant,
-            il n'est pas assez bas niveau pour ce projet.\\
-            Par exemple il serait impossible d'envoyer des paquets au niveau de la
-            couche lisaison de données ou encore, avoir accès aux tables de routages \textsc{ip}.\\
+            petit sous-ensemble de la bibliothèque standard Python. Il est
+            optimisé pour fonctionner sur des microcontrôleurs, open source et facile à utiliser.
+            La documentation est complète et de nombreux tutoriels sont disponible et facilement compréhensible.
+            Cependant, MicroPython n'expose pas les fonctions de bas niveau utiles pour ce projet.
+            Par exemple il serait difficile d'envoyer des paquets au niveau de la
+            couche lisaison de données ou encore, d'avoir accès aux tables de routages \textsc{ip}.\\
+            Voici un exemple illustrant la simplicité du langage. Cet exemple permet de faire clignoter
+            une led branchée au \textsc{gpio} 23.
+            \begin{minted}[frame=lines,framesep=2mm,baselinestretch=1.2,bgcolor=myGray,fontsize=\footnotesize, linenos]{python}
+import machine
+import time
+led = machine.Pin(23, machine.Pin.OUT) #led configuration
+while(TRUE):
+    led.value(1) #led on
+    time.sleep(1) # delay
+    led.value(0) #led off
+    time.sleep(2)
+            \end{minted}
         
         \item \textbf{IoT Development Framework (IDF)}\\
             IDF est l'environnement du constucteur de l'\esp\ (Espressif).
             La documentation est complète mais le code source n'est pas entièrement
             disponible. Pour certaines parties du framework, nous n'avons accès qu'aux
-            fichiers d'entête.\\
-            Ce framework est natif et nous apportera donc une plus grande fidélité à l'\esp. \\
+            fichiers d'entête.
+            Ce framework est natif et nous apportera donc une plus grande fidélité à l'\esp.
             Cet environnement nous donne aussi accès à des fonctionnalités de FreeRTOS
-            (free real-time operating system).\\
-            FreeRTOS est un système d'exploitation temps réel open source pour microcontrôleurs.
-            Ses fonctionnalités pourront nous être utiles pour le projet.\\
+            (free real-time operating system), un système d'exploitation temps
+            réel open source pour microcontrôleurs. Ses fonctionnalités pourront nous être 
+            utiles pour ce projet.
+            des protocoles tel que \espmesh\ ou
+            \espnow\ sont également disponible. Ils faciliteraient la mise en place d'un réseau \mesh.
+            Voici un exemple de code permettant de faire clignoter une led.
+            \begin{minted}[frame=lines,framesep=2mm,baselinestretch=1.2,bgcolor=myGray,fontsize=\footnotesize, linenos]{c}
+            #include <stdio.h>
+            #include "freertos/FreeRTOS.h"
+            #include "freertos/task.h"
+            #include "driver/gpio.h"
+            #include "sdkconfig.h"
 
+            #define BLINK_GPIO CONFIG_BLINK_GPIO
+            
+            void app_main(void)
+            {
+                /*Configure the IOMUX register for pad BLINK_GPIO*/
+                gpio_pad_select_gpio(BLINK_GPIO);
+                /* Set the GPIO as a push/pull output */
+                gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+                while(1) {
+                    /* Blink off (output low) */
+                    printf("Turning off the LED\n");
+                    gpio_set_level(BLINK_GPIO, 0);
+                    vTaskDelay(1000 / portTICK_PERIOD_MS);
+                    /* Blink on (output high) */
+                printf("Turning on the LED\n");
+                    gpio_set_level(BLINK_GPIO, 1);
+                    vTaskDelay(1000 / portTICK_PERIOD_MS);
+                }
+            }
+            \end{minted}
         \item \textbf{Arduino}\\
             L'environnement Arduino se base sur IDF. Il est donc possible que certaines
             fonctionnalités d'IDF ne soient pas disponible. 
             La documentation est moins complète qu'IDF mais tout le code source est disponible.
             Cet environnement semble assez bas niveau car nous avons accès au driver Ethernet
             et à la couche \textsc{ip}.
+            \begin{minted}[frame=lines,framesep=2mm,baselinestretch=1.2,bgcolor=myGray,fontsize=\footnotesize, linenos]{c}
+#define LED  2
+ 
+ void setup() {
+   pinMode(LED,OUTPUT);
+ }
+  
+ void loop() {
+   delay(1000);
+   digitalWrite(LED,HIGH);
+   delay(100);
+   digitalWrite(LED,LOW);
+ }
+
+            \end{minted}
     \end{enumerate}
     \vspace{1cm}
     Il est évident que nous ne choisirons pas MicroPython car certaines fonctionnalités utiles
@@ -139,11 +195,11 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Protocoles de routage}
-    Dans cette section, nous discutons des différents protocoles de routage envisageables.\\
-    Nous allons d'abord établir un classement des protocoles de routage \mesh.\\
+    Dans cette section, nous discutons de différents protocoles de routage envisageables.
+    Nous allons d'abord établir un classement des protocoles de routage \mesh.
     Ensuite nous allons décrire brièvement les protocoles les plus cités dans la littérature pour les classer
     en fonction de leur appartenance à une catégorie établie dans notre classement. 
-    Enfin, nous pourrons choisir un protocole à implémenter pour ce projet.\\
+    Enfin, nous allons choisir un protocole à implémenter pour ce projet.\\
 
     \underline{\textbf{Classification}}\\
 
@@ -156,11 +212,10 @@
         \item \textbf{Réactifs}: Ces protocoles établissent une route uniquement quand des paquets
             doivent être transférés.
     \end{enumerate}
-    Nous écarterons les protocoles proactifs pour ce projet car ils gardent
-    beaucoup d'information en mémoire. Ils ne passent donc pas à l'échelle.\\
-    Les protocoles réactifs sont plus économes en ressources mais nécessitent parfois un délai
-    plus long pour établir une route
-    car elles sont établies à la demande.\\
+    Nous écartons les protocoles proactifs pour ce projet car ils gardent
+    beaucoup d'information en mémoire. Ils ne passent donc pas à l'échelle.
+    Les protocoles réactifs sont plus économes en ressources, mais nécessitent parfois un délai
+    plus long pour établir une route, car elles sont établies à la demande.\\
 
     \underline{\textbf{Description}}\\
 

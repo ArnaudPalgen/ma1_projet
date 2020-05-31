@@ -15,8 +15,9 @@ class Client(threading.Thread):
             data = self.sock.recv(BUFF_SIZE)
             if data:
                 print('[',int(round(time.time() * 1000)),']','data: ', data)#time in milliseconds
-                while True:
-                    self.sock.send(data)
+                #while True:
+                self.sock.send(data)
+                #time.sleep(1)#sleep 1s
 
 if __name__ == "__main__":
     if(len(sys.argv) < 3):

@@ -22,6 +22,8 @@
                 Chaque noeud possède sa table de routage. Soit $p$ un noeud, sa table de routage contient les adresses \mac\ 
                 des noeuds du sous-arbre ayant $p$ comme racine, et également celle de $p$.\\
                 Elle est partitionnée en sous-tables qui correspondent aux sous-arbres des enfants de $p$.
+                Par exemple, nous pouvons apercevoir sur la figure précédente, la table de routage du noeud B (en rouge).
+                Elle est partitionnée en 2 sous-table (en bleu) contenant respectivement les noeuds C, D, E, F et G, H, I.
             \item Acheminement de paquets\\
                 Quand un paquet est reçu,
                 \begin{itemize}
@@ -42,29 +44,48 @@
                     \item \textbf{Sélection automatique}\\
                         Chaque noeud idle va transmettre son adresse \mac\ et
                         la valeur de son \rssi\ (Received Signal Strength Indication) avec le routeur via des beacons.
-                        Dans le but de choisir comme racine, le noeud le plus proche de l'AP.\\
+                        Dans le but de choisir comme racine, le noeud le plus proche de l'AP.
                         Simultanément, chaque noeud scanne les beacons des autres noeuds. Si un noeud
                         en détecte un autre avec un \rssi\ strictement plus fort, il va transmettre le contenu de
-                        ce beacon (càd voter pour ce noeud).\\
-                        Ce processus sera répété pendant un nombre minimum d'itérations.\\
-                        Après toutes les itérations, chaque noeud va calculer le ratio
-                        \[\frac{nombre\ de\ votes}{nombre\ de\ noeuds\ participants\ \textrm{\textit{à l'élection}}}\]
+                        ce beacon (càd voter pour ce noeud).
+                        Ce processus sera répété pendant un nombre minimum d'itérations (10 par défaut).
+                        Une itération pour un noeud, consiste à avoir reçu les beacons de tous les autres noeuds
+                        et avoir voté pour le noeud ayant le meilleur \rssi\ avec le routeur.
+                        Après toutes les itérations, chaque noeud va calculer le ratio suivant: 
+                        \[\frac{nombre\ de\ votes\ pour\ ce\ noeud}{nombre\ de\ noeuds\ participants\ \textrm{\textit{à l'élection}}}\]
+                        Cest deux informations sont connues par la réception des beacons.
                         Si ce ratio est au-dessus d'un certain seuil (par défaut 90\%), ce noeud deviendra la racine.\footnote{
                             Si plusieurs racines sont élues, deux réseaux \espmesh\ seront créés.
-                            Dans ce cas, \espmesh\ possède un mécanisme interne qui va fusionner les deux réseaux
+                            Dans ce cas, \espmesh\ possède un mécanisme interne (dont le fonctionnement n'est pas décrit par Espressif) qui va fusionner les deux réseaux
                             ssi les racines sont connectées au même routeur.
                         }
 
 
 
                     \item \textbf{Sélection par l'utilisateur}\\
-                        La racine se connecte au routeur et elle, ainsi que les autres noeuds, oublient le processus
+                        Le choix de la racine peut être réalisé par l'utilisateur via l'\textsc{API} \espmesh.
+                        Dans ce cas, la racine se connecte au routeur et elle, ainsi que les autres noeuds, oublient le processus
                         d'élection.
                 \end{itemize}
             \item Formation de la deuxième couche\\
-                Une fois le processus d'élection d'une racine terminé, chaque noeud va émettre des beacons
-                pour permettre aux autres noeuds de détecter sa présence et de connaître son statut.
-                Ces beacons contiennent les informations suivantes:
+                %Une fois le processus d'élection d'une racine terminé, chaque noeud va émettre des beacons
+                %pour permettre aux autres noeuds de détecter sa présence et de connaître son statut.
+                %Ces beacons contiennent les informations suivantes:
+                %\begin{itemize}
+                %    \item[$\bullet$] Type du noeud (racine, intermédiaire, feuille, idle)
+                %    \item[$\bullet$] Couche sur laquelle se trouve le noeud
+                %    \item[$\bullet$] Nombre de couches maximum autorisées dans le réseau
+                %    \item[$\bullet$] Nombre de noeuds enfants
+                %    \item[$\bullet$] Nombre maximum d'enfants   
+                %\end{itemize}
+                %Les noeuds idle à portée de la racine vont s'y connecter et devenir des noeuds intermédiaires.
+                Une fois le processus d'élection d'une racine terminé,
+                les noeuds idle à portée de la racine vont s'y connecter et devenir des noeuds intermédiaires
+            
+            \item Formation des autres couches\\
+                %Les noeuds idle à portée de noeuds intermédiaires vont s'y connecter. 
+                Chaque noeud du réseau \espmesh\ émet périodiquement des beacons contenant les
+                informations suivantes:
                 \begin{itemize}
                     \item[$\bullet$] Type du noeud (racine, intermédiaire, feuille, idle)
                     \item[$\bullet$] Couche sur laquelle se trouve le noeud
@@ -72,11 +93,10 @@
                     \item[$\bullet$] Nombre de noeuds enfants
                     \item[$\bullet$] Nombre maximum d'enfants   
                 \end{itemize}
-                Les noeuds idle à portée de la racine vont s'y connecter et devenir des noeuds intermédiaires.
-            
-            \item Formation des autres couches\\
-                Les noeuds idle à portée de noeuds intermédiaires vont s'y connecter. Si plusieurs parents
-                sont possibles, un noeud choisira son parent selon deux critères connus par les beacons des noeuds intermédiaires.
+                %Sur base de ces beacons, les noeuds idle vont connaître leurs potentiels parents. Si plusieurs parents
+                %sont possibles, un noeud choisira son parent selon deux critères connus par les beacons des noeuds intermédiaires.
+                Sur base du contenu de ces beacons, les noeuds idle conaissent leurs potientiels parents.
+                Si plusieurs parents sont possibles, un noeud choisira son parent selon deux critères:
                 \begin{enumerate}
                     \addtolength{\itemindent}{1cm}
                     \item[1.] La couche sur laquelle se situe le candidat parent:
@@ -85,39 +105,40 @@
                         sur la couche la moins profonde, celui avec le moins d'enfants sera choisi. 
                 \end{enumerate}
                 
-                Un noeud peut aussi se connecter à un parent prédéfini.\\
-
+                Un noeud peut également se connecter à un parent prédéfini.
                 Une fois connectés, les noeuds deviennent des noeuds intermédiaires si le nombre maximal de couches n'est pas atteint.
                 Sinon, les noeuds de la dernière couche deviennent automatiquement
                 des feuilles, empêchant d'autres noeuds dans l'état idle de s'y connecter.
 
         \end{enumerate}
         Pour éviter les boucles, un noeud ne va pas se connecter à un noeud dont l'adresse \mac\ se trouve dans sa table de routage.
-        \vspace{0.5cm}
-
+        \vspace{0.5cm}\\
         \textbf{Mise sous tension asynchrone}\newline
             La structure du réseau peut être affectée par l'ordre dans lequel les noeuds sont mis sous tension.
             Les noeuds ayant une mise en tension retardée suivront les deux règles suivantes:
             \begin{enumerate}
-                \item Si une racine existe déjà, le noeud ne vas pas essayer d'élire une nouvelle racine
+                \item Si le noeud détecte, par les beacons, qu'une racine existe déjà, il ne vas pas essayer
+                    d'élire une nouvelle racine
                     même si son \rssi\ avec le routeur est meilleur. Il va rejoindre le réseau comme un noeud idle. \\
                     Si le noeud est la racine désignée, tous les autres noeuds vont rester idle
                     jusqu'à ce que le noeud soit mis sous tension.
-                \item Si le noeud devient un noeud intermédiraire, il peut devenir le meilleur parent d'un autre noeud ( cet autre noeud changera donc de parent).
-                \item Si un noeud idle a un parent prédéfini et que ce noeud n'est pas sous tension, il ne va pas essayer de se connecter à un autre parent.
+                \item Si le noeud devient un noeud intermédiraire, il peut devenir le meilleur parent d'un autre noeud 
+                (cet autre noeud changera donc de parent).
+                \item Si un noeud idle a un parent prédéfini et que ce noeud n'est pas sous tension, il ne va pas essayer
+                de se connecter à un autre parent.
             \end{enumerate}
         \vspace{0.5cm}
         \textbf{Défaillance d'un noeud}\newline
             \begin{itemize}
                 \item Défaillance de la racine\\
                     Si la racine tombe, les noeuds de la deuxième couche vont d'abord tenter de s'y reconnecter.
-                    Après plusieurs échecs, les noeuds de la deuxième couche vont entamer entre eux le processus d'élection d'une nouvelle racine.\\
+                    Après plusieurs échecs, les noeuds de la deuxième couche vont entamer entre eux le processus d'élection d'une nouvelle racine.
                     Si la racine ainsi que plusieurs couches tombent, le processus d'élection sera initialisé sur la couche la plus haute.
 
 
                 \item Défaillance d'un noeud intermédiaire\\
                     Si un noeud intermédiaire tombe, ses enfants vont d'abord tenter de s'y reconnecter.
-                    Après plusieurs échecs, ils se connecteront au meilleur parent disponible.\\
+                    Après plusieurs échecs, ils se connecteront au meilleur parent disponible.
                     S'il n'y a aucun parent possible, ils se mettront dans l'état idle.
                     \begin{figure}[H]
                         \centering
@@ -130,15 +151,15 @@
                 Un changement de racine n'est possible que dans deux situations:
                 \begin{enumerate}
                     \item La racine tombe. (voir point précédent)
-                    \item La racine le demande.
+                    \item La racine le demande via un appel à \textbf{esp\_mesh\_waive\_root()}.
                         Dans ce cas, un processus d'élection de racine sera initialisé. La nouvelle racine élue
                         enverra alors une \textit{switch request} à la racine actuelle qui répondra par un acquittement.
                         Ensuite la nouvelle racine se déconnectera de son parent et se connectera au routeur.
                         L'ancienne racine se déconnectera du routeur et deviendra un noeud idle pour enfin se connecter à un nouveau parent.
                 \end{enumerate}
         \textbf{Paquets ESP-MESH}\\
-            Les paquets \espmesh\ sont contenus dans une trame WiFi. Une transmission multi-sauts utilisera un paquet \espmesh\ transporté 
-            entre chaque noeud par un paquet wifi différent.\\
+            Les paquets \espmesh\ sont contenus dans une trame \wifi. Une transmission multi-sauts utilisera un paquet \espmesh\ transporté 
+            entre chaque noeud par une trame \wifi\ différente.
             La figure \ref{fig_meshPacket} montre la structure d'un paquet \espmesh:\\
 
             \begin{figure}[h]
@@ -147,43 +168,13 @@
                 \caption{Paquet \espmesh\ \cite{esp-mesh_w}}
                 \label{fig_meshPacket}
             \end{figure}
-            Le header d'un paquet \espmesh\ contient les adresses \mac\ source et destination ainsi que diverses options.\\
+            Le header d'un paquet \espmesh\ contient les adresses source et destination ainsi que diverses options.
             Le payload d'un paquet \espmesh\ contient les données de l'application.
-        
-        \vspace{0.5cm}
-        \textbf{Multicasting}\\
-            Le multicasting permet d'envoyer simultanément un paquet \espmesh\ à plusieurs noeuds du réseau. Le multicasting
-            peut être réalisé en spécifiant
-            \begin{itemize}
-                \item Soit un ensemble d'adresses \mac\\
-                    Dans ce cas, l'adresse de destination doit être
-                    {\fontfamily{qcr}\selectfont \textls[-300]{\small 0 1 : 0 0 : 5 E : x x : x x : x x}}
-                    Cela signifie que le paquet est un paquet multicast et que la liste des adresses peut être obtenue dans les options du header.
-                \item Soit un groupe préconfiguré de noeuds\\
-                    Dans ce cas, l'adresse de destination du paquet doit être l'ID\footnote{Dans un réseau\espmesh, chaque groupe a un ID unique}
-                    du groupe et un flag \textsc{mesh\_data\_group} doit être ajouté. % todo ajouté où ?
-                    % todo comment les noeuds sont au courant qu'ils sont dans ce groupe
-            \end{itemize}
 
-        \vspace{0.5cm}
-        \textbf{Broadcasting}\\
-            Le broadcasting permet de transmettre un paquet \espmesh\ à tous les noeuds du réseau. Pour éviter de gaspiller de
-            la bande passante, \espmesh\ utilise les règles suivantes:
-            \begin{enumerate}
-                \item Quand un noeud intermédiare reçoit un paquet broadcast de son parent, il va le transmettre à tous ses enfants
-                    et en stocker une copie
-                \item Quand un noeud intermédiaire est la source d'un paquet broadcast, il va le transmettre à son parent et à ses enfants
-                \item Quand un noeud intermédiaire reçoit un paquet d'un de ses enfants, il va le transmettre à ses autres enfants, son parent
-                    et en stocker une copie
-                \item Quand une feuille est la source d'un paquet broadcast, elle va le transmettre à son parent
-                \item Quand la racine est la source d'un paquet broadcast, elle va le transmettre à ses enfants
-                \item Quand la racine reçoit un paquet broadcast de l'un de ses enfants, elle va le transmettre à ses autres enfants et en stocker une copie
-                \item Quand un noeud reçoit un paquet broadcast avec son adresse \mac\ comme adresse source, il l'ignore
-                \item Quand un noeud intermédiaire reçoit un paquet broadcast de son parent, s'il possède une copie de ce paquet (càd que ce paquet a été à l'origine transmis par l'un de ses enfants), il va l'ignorer
-                    pour éviter les cycles ( protocole d'inondation)
-            \end{enumerate}
-        \vspace{0.5cm}
-        \textbf{Contrôle de flux}\\%todo pas clair
+            Dans le cas où l'adresse de destination est une adrese \textsc{ip}, le paquet sera envoyé à la racine du réseau
+            \espmesh\ qui transmet le payload du paquet (par exemple en initiant une connexion tcp avec un socket).
+        \vspace{0.5cm}\\
+        \textbf{Contrôle de flux}\\
             Pour éviter que les parents soient submergés de flux venant de leurs enfants, chaque parent va
             assigner une fenêtre de réception à chaque enfant. Chaque noeud enfant doit demander une fenêtre
             de réception avant chaque transmission. La taille de la fenêtre peut être ajustée dynamiquement.
@@ -191,13 +182,13 @@
             \begin{enumerate}
                 \item Le noeud enfant envoit à son parent une requête de fenêtre. Cette requête contient le numéro de séquence du paquet en attente d'envoi.
                 \item Le parent reçoit la requête et compare le numéro de séquence avec celui du précédent paquet envoyé par l'enfant.
-                    La comparaison est utilisée pour calculer la taille de la fenêtre qui est transmise à l'enfant.
-                \item L'enfant transmet le paquet en accord avec la taille de fenêtre. Une fois la fenêtre de réception utilisée, l'enfant doit renvoyer une demande de fenêtre.
+                    La comparaison est utilisée pour calculer la taille de la fenêtre qui est transmise à l'enfant.\footnote{Ce calcul n'est pas précisé par Espressif}
+                \item L'enfant transmet le paquet conformément à la taille de fenêtre spécifiée par le parent. Une fois la fenêtre de réception utilisée, l'enfant doit renvoyer une demande de fenêtre.
             \end{enumerate}
         \vspace{0.5cm}
         \textbf{Performances}\\
-            Espressif fournit les performances d'\espmesh\ pour un réseau de 100 noeuds avec un nombre maximum de couches de 6 
-            et un nombre d'enfants maximum par noeuds de 6.(voir table \ref{performances_espMesh})
+            Espressif fournit les performances d'\espmesh\ pour un réseau de maximum 100 noeuds, 6 couches et
+            un nombre d'enfants par noeud de 6 (voir table \ref{performances_espMesh}).
             \begin{table}[H]
                 \begin{tabular}{|l|l|}
                     \hline
@@ -208,9 +199,8 @@
                 \caption{Performances d'\espmesh\ \cite{esp-mesh_w}}
                 \label{performances_espMesh}
             \end{table}
-
-            
-        \textbf{Discussion}\\
+            \hspace{-0.75cm}
+            \textbf{Discussion}\\
             A première vue, une topologie en arbre n'est pas robuste car si la racine tombe,
             tout le reste du réseau est déconnecté. Cependant le processus d'élection
             d'une nouvelle racine semble efficace selon les résulats fournis par Espressif.

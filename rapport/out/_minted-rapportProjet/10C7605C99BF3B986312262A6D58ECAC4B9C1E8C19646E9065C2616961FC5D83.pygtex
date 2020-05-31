@@ -1,0 +1,14 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZsh{}define LED  2}
+
+ \PYG{k+kt}{void} \PYG{n+nf}{setup}\PYG{p}{()} \PYG{p}{\PYGZob{}}
+   \PYG{n}{pinMode}\PYG{p}{(}\PYG{n}{LED}\PYG{p}{,}\PYG{n}{OUTPUT}\PYG{p}{);}
+ \PYG{p}{\PYGZcb{}}
+
+ \PYG{k+kt}{void} \PYG{n+nf}{loop}\PYG{p}{()} \PYG{p}{\PYGZob{}}
+   \PYG{n}{delay}\PYG{p}{(}\PYG{l+m+mi}{1000}\PYG{p}{);}
+   \PYG{n}{digitalWrite}\PYG{p}{(}\PYG{n}{LED}\PYG{p}{,}\PYG{n}{HIGH}\PYG{p}{);}
+   \PYG{n}{delay}\PYG{p}{(}\PYG{l+m+mi}{100}\PYG{p}{);}
+   \PYG{n}{digitalWrite}\PYG{p}{(}\PYG{n}{LED}\PYG{p}{,}\PYG{n}{LOW}\PYG{p}{);}
+ \PYG{p}{\PYGZcb{}}
+\end{Verbatim}

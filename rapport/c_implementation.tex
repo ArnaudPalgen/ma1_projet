@@ -401,7 +401,7 @@ void esp_now_tx(void *arg){
 void app_main(void){    
             /* ... */
     /* Wi-Fi initialization */
-    wifi_init_config_t config = WIFI_INIT_CONFIG_DEFAULT();    
+    wifi_init_config_t config = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&config));
     ESP_ERROR_CHECK(esp_wifi_set_mode(ESPNOW_WIFI_MODE));
     ESP_ERROR_CHECK(esp_wifi_start());

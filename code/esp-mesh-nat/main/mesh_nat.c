@@ -1,4 +1,14 @@
+/**
+ * @file mesh_nat.c
+ * @author Arnaud Palgen
+ * @brief 
+ * @date 30-05-2020
+ * 
+ * 
+ */
+
 #include <string.h>
+#include <stdlib.h>
 
 #include "esp_wifi.h"
 #include "esp_system.h"
@@ -13,21 +23,17 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
-#define MT_SIZE 10
 #define MIN_PORT 1024
 
-#define RX_BUF_SIZE  20
-#define TX_BUF_SIZE  20
+#define RX_BUF_SIZE  6
+#define TX_BUF_SIZE  6
+
 #define MATCHING_TABLE_SIZE 10
 
-#define INTERNAL_TIMEOUT portMAX_DELAY
+#define INTERNAL_TIMEOUT portMAX_DELAY // wait forever
 
 #define DEST_ADDR "192.168.0.102"
-#define DESR_PORT 5002
-
-#define IS_SOCK_ADDR_LEN_VALID(namelen)  ((namelen) == sizeof(struct sockaddr_in)) // namelen longueur
-#define IS_SOCK_ADDR_TYPE_VALID(name)    ((name)->sa_family == AF_INET) //name sockaddr
-#define IS_SOCK_ADDR_ALIGNED(name)      ((((mem_ptr_t)(name)) % 4) == 0)
+#define DEST_PORT 5002
 
 
 static int currentPort = 1024; // max = 65535
@@ -37,16 +43,34 @@ static const uint8_t MESH_ID[6] = { 0x77, 0x77, 0x77, 0x77, 0x77, 0x77};
 
 struct record{
     int sock;
-    uint8_t *addr;
+    uint8_t addr[6];
 };
 
-static struct record* matching_table[MATCHING_TABLE_SIZE]; // on autorise 10 sockets max
+static struct record* matching_table[MATCHING_TABLE_SIZE];
 
-//static int maxSock = 0;
+/**
+ * @brief display the matching table
+ * 
+ */
+void printMatching_table(){
 
-u32_t *myIP=NULL;
+    printf("============= MATCHING TABLE=============\n");
+    for(int j=0; j<MATCHING_TABLE_SIZE; j++){
+        if(matching_table[j]!=NULL){
+            printf("item index= %d, sock = %d, addr = "MACSTR"\n", j, matching_table[j]->sock, MAC2STR(matching_table[j]->addr));
+        }else{
+            break;
+        }
+    }
+    printf("=========================================\n");
+}
 
-
+/**
+ * @brief display an array of uint8_t
+ * 
+ * @param array 
+ * @param size 
+ */
 void printData(uint8_t *array, int size){
 	for(int i=0; i<size; i++){
 	    printf("%d ",array[i]);
@@ -54,12 +78,19 @@ void printData(uint8_t *array, int size){
 	printf("\n");
 }
 
-//envoit depuis interne pour externe/interne
+/**
+ * @brief send data to an internal or external device
+ * 
+ * @param arg 
+ */
 void esp_mesh_internal_tx(void *arg){
     esp_err_t err;
 
-    static uint8_t tx_buf[TX_BUF_SIZE]= {238, 238, 238, 238, 238, 
-        238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238};
+    //static uint8_t tx_buf[TX_BUF_SIZE]= {238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 238};
+
+    /* send MAC adress as data*/
+    static uint8_t tx_buf[TX_BUF_SIZE];
+    esp_wifi_get_mac(ESP_IF_WIFI_STA, &tx_buf);
 
     bool is_running = true;
 
@@ -69,39 +100,44 @@ void esp_mesh_internal_tx(void *arg){
     mesh_data.size = sizeof(tx_buf);
     mesh_data.proto = MESH_PROTO_BIN;
 
+    /* dest addr*/
     mesh_addr_t to;
     ip4_addr_t address;
     address.addr = ipaddr_addr(DEST_ADDR);
     to.mip.ip4 = address;
-    to.mip.port= DESR_PORT;
-
-
+    to.mip.port= DEST_PORT;
+    
+    int delay;
 
     while(is_running){
         /* to, data, flag, opt, opt_count
          * to is set to NULL for root
          **/
-        //err = esp_mesh_send(NULL, &mesh_data, 0, NULL, 0);
+        //err = esp_mesh_send(NULL, &mesh_data, 0, NULL, 0); // to the root
         err = esp_mesh_send(&to, &mesh_data, MESH_DATA_TODS, NULL, 0);// to external ip
         if(err == ESP_OK){
             ESP_LOGI(TAG, "data sent!");
-            //sent++;
         }else{
             ESP_LOGE(TAG, "data was not sent");
         }
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
-        is_running = false;
+        delay = (rand() % (5000 - 500 + 1)) + 500; //random delay
+        vTaskDelay(delay / portTICK_PERIOD_MS);
+        //is_running = false;
     }
     vTaskDelete(NULL);// delete the task
 }
 
-//recoit en interne
+/**
+ * @brief receives data from an internal device
+ * 
+ * @param arg 
+ */
 void esp_mesh_internal_rx(void *arg){
     esp_err_t err;
 
     uint8_t rx_buf[RX_BUF_SIZE]={0,}; // buffer
     
-    mesh_addr_t from;// source address
+    mesh_addr_t from;// src address
     
     int flag = 0;
 
@@ -139,22 +175,35 @@ void esp_mesh_internal_rx(void *arg){
     vTaskDelete(NULL);// delete the task
 }
 
-//recoit depuis externe pour interne
-//for root
-void esp_mesh_external_rx(void *arg){//receive
+/**
+ * @brief receives data from an external device for an internal device
+ * only for the root
+ * @param arg 
+ */
+void esp_mesh_external_rx(void *arg){
     
     uint8_t rx_buf[RX_BUF_SIZE]={0,}; // buffer
     int recv_value, sock;
     bool is_running = true;
     struct sockaddr_in src;
     socklen_t sockLen;
-    
+
+    mesh_addr_t mesh_dest_addr;
+    mesh_data_t mesh_data;
+    mesh_data.proto = MESH_PROTO_BIN;
+
+    uint8_t *mac_addr;
+    esp_err_t err;
     /* initializes the set of descriptors */
     static fd_set readSet;
     FD_ZERO(&readSet);
 
     int maxSock=-1;
     int listenSock=NULL;
+
+    struct timeval timeout = {
+        .tv_usec = 500000//in microseconds (= 500 ms)
+    };
 
     while(is_running){
         FD_ZERO(&readSet);
@@ -169,14 +218,17 @@ void esp_mesh_external_rx(void *arg){//receive
             }
         }
 
-        if(select(maxSock+1, &readSet, NULL, NULL, NULL) < 0){
+        if(select(maxSock+1, &readSet, NULL, NULL, &timeout) < 0){
             ESP_LOGE(TAG, "select error");
         }
+        
         for(int i=0; i<MATCHING_TABLE_SIZE; i++){
             if(matching_table[i]==NULL){
                 break;
             }
             sock = matching_table[i]->sock;
+            mac_addr = matching_table[i]->addr;
+            
             if(FD_ISSET(sock, &readSet)){
                 recv_value = recvfrom(sock, rx_buf, sizeof(rx_buf), 0, &src, &sockLen);
                 if(recv_value == 0){
@@ -187,10 +239,43 @@ void esp_mesh_external_rx(void *arg){//receive
                 }else if(recv_value < 0){
                     ESP_LOGE(TAG, "recv error");
                 }else{
-                    ESP_LOGI(TAG, "receveid %d bytes to port %d", recv_value, htons(src.sin_port));//n'affiche pas le bon port faire +1024 ? 
+                    ESP_LOGI(TAG, "receveid %d bytes to port %d", recv_value, i+MIN_PORT);
                     printData(rx_buf, recv_value);
+                    ESP_LOGI(TAG, "send data to "MACSTR"", MAC2STR(mac_addr));
 
+                    mesh_data.size = sizeof(rx_buf);
+                    mesh_data.data = rx_buf;
                     
+                    memcpy(mesh_dest_addr.addr, mac_addr, 6);
+
+                    err = esp_mesh_send(&mesh_dest_addr, &mesh_data, MESH_DATA_P2P, NULL, 0);
+                    if(err == ESP_OK){
+                        ESP_LOGI(TAG, "data sent!");
+                    }else if(err == ESP_FAIL){
+                        ESP_LOGE(TAG, "ESP_FAIL");
+                    }else if(err == ESP_ERR_MESH_ARGUMENT){
+                        ESP_LOGE(TAG, "ESP_ERR_MESH_ARGUMENT");
+                    }else if(err == ESP_ERR_MESH_NOT_START){
+                        ESP_LOGE(TAG, "ESP_ERR_MESH_NOT_START");
+                    }else if(err == ESP_ERR_MESH_DISCONNECTED){
+                        ESP_LOGE(TAG, "ESP_ERR_MESH_DISCONNECTED");
+                    }else if(err == ESP_ERR_MESH_EXCEED_MTU){
+                        ESP_LOGE(TAG, "ESP_ERR_MESH_EXCEED_MTU");
+                    }else if(err == ESP_ERR_MESH_NO_MEMORY){
+                        ESP_LOGE(TAG, "ESP_ERR_MESH_NO_MEMORY");
+                    }else if(err == ESP_ERR_MESH_TIMEOUT){
+                        ESP_LOGE(TAG, "ESP_ERR_MESH_TIMEOUT");
+                    }else if(err == ESP_ERR_MESH_QUEUE_FULL){
+                        ESP_LOGE(TAG, "ESP_ERR_MESH_QUEUE_FULL");
+                    }else if(err == ESP_ERR_MESH_NO_ROUTE_FOUND){
+                        ESP_LOGE(TAG, "MAC STR: "MACSTR"", MAC2STR(mesh_dest_addr.addr));
+                        ESP_LOGE(TAG, "ESP_ERR_MESH_NO_ROUTE_FOUND");
+                    }else if(err == ESP_ERR_MESH_DISCARD){
+                        ESP_LOGE(TAG, "ESP_ERR_MESH_DISCARD");
+                    }else{
+                        ESP_LOGE(TAG, "data was not sent");
+                    }
+
                 }
             }
         }
@@ -237,10 +322,7 @@ void esp_mesh_external_tx(void *arg){//send
 
     int flag = 0;
 
-    bool is_running = true;
-    
-    TaskHandle_t xHandle = NULL;
-    
+    bool is_running = true;    
 
     while(is_running){
         
@@ -260,17 +342,25 @@ void esp_mesh_external_tx(void *arg){//send
         memcpy((u32_t *) &ip_to_addr.sin_addr, &mesh_to_addr.mip.ip4.addr, 
             sizeof(mesh_to_addr.mip.ip4.addr));
 
-        
+        /* search if socket is already created */
         struct record* item=NULL;
         int i=0;
+
         for(i=0; i<MATCHING_TABLE_SIZE; i++){
             if(matching_table[i]==NULL){
                 break;
             }
-            if(!memcmp(matching_table[i]->addr, mesh_from_addr.addr, sizeof(mesh_from_addr.addr))){//socket for node already exist
-                item = matching_table[i];
-                break;
+
+            int l = 0;
+            for(l=0;l<=6;l++){
+                if(mesh_from_addr.addr[l] != matching_table[i]->addr[l]){
+                    break;
+                }
             }
+            if(l==6){
+                item = matching_table[i];
+            }
+
         }
 
         if(item !=NULL){
@@ -305,26 +395,18 @@ void esp_mesh_external_tx(void *arg){//send
                 close(sock);
                 break;
             }
-            /*if(sock > maxSock){
-                maxSock = sock;
-            }*/
-            //ESP_LOGE(TAG, "size before: %d",sizeof(readSet));
-            //FD_SET(sock, &readSet);// add sock to readSet
-            //ESP_LOGE(TAG, "size after: %d",sizeof(readSet));
-            //##########################################
+
             if(sock < 0){
                 continue;
             }
             ESP_LOGI(TAG, "socket bound and connected");
+            
+            /*  create new record*/
             item  = (struct record*) malloc(sizeof(struct record));
             item->sock = sock;
-            item->addr = mesh_from_addr.addr;
+            memcpy(item->addr, &mesh_from_addr.addr, 6);
             matching_table[currentPort-MIN_PORT] = item;
             currentPort++;
-            if(xHandle !=NULL){
-                vTaskDelete(xHandle);
-            }
-            xTaskCreate(esp_mesh_external_rx, "ERX", 3072, NULL, 5, &xHandle);
         }
         err = send(item->sock, mesh_data.data, mesh_data.size, 0);
         if(err < 0){
@@ -358,7 +440,7 @@ void start_external_comm(void){
 
     if (!is_comm_external_started && esp_mesh_is_root()) {
         is_comm_external_started = true;
-        //xTaskCreate(esp_mesh_external_rx, "ERX", 3072, NULL, 5, NULL);
+        xTaskCreate(esp_mesh_external_rx, "ERX", 3072, NULL, 5, NULL);
         xTaskCreate(esp_mesh_external_tx, "ETX", 3072, NULL, 5, NULL);
     }
 }
@@ -366,8 +448,7 @@ void start_external_comm(void){
 
 void mesh_event_handler(mesh_event_t event)
 {
-    //ensemble d'adresse mesh union(mac address, mip address mip_t(ipv4, port))
-    mesh_addr_t id = {0,};// id du reseau mesh
+    mesh_addr_t id = {0,};// id of mesh network
     ESP_LOGD(TAG, "esp_event_handler:%d", event.id);
 
     switch (event.id) {
@@ -421,13 +502,12 @@ void mesh_event_handler(mesh_event_t event)
     case MESH_EVENT_LAYER_CHANGE:
         ESP_LOGI(TAG, "<MESH_EVENT_LAYER_CHANGE>");
         break;
-    case MESH_EVENT_ROOT_ADDRESS:// on a l'adresse de root
+    case MESH_EVENT_ROOT_ADDRESS:
         ESP_LOGI(TAG, "<MESH_EVENT_ROOT_ADDRESS>root address:"MACSTR"",
                  MAC2STR(event.info.root_addr.addr));
         break;
     case MESH_EVENT_ROOT_GOT_IP:
         /* root starts to connect to server */
-        myIP = &event.info.got_ip.ip_info.ip.addr;
         ESP_LOGI(TAG,
                  "<MESH_EVENT_ROOT_GOT_IP>sta ip: " IPSTR ", mask: " IPSTR ", gw: " IPSTR,
                  IP2STR(&event.info.got_ip.ip_info.ip),
@@ -550,9 +630,3 @@ void app_main(void){
     ESP_ERROR_CHECK(esp_mesh_start());
 
 }
-
-/*
-00172   typedef struct fd_set {
-00173           unsigned char fd_bits [(FD_SETSIZE+7)/8];
-00174         } fd_set;
-*/
