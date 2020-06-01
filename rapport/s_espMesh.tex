@@ -21,9 +21,9 @@
             \item Table de routage\\
                 Chaque noeud possède sa table de routage. Soit $p$ un noeud, sa table de routage contient les adresses \mac\ 
                 des noeuds du sous-arbre ayant $p$ comme racine, et également celle de $p$.\\
-                Elle est partitionnée en sous-tables qui correspondent aux sous-arbres des enfants de $p$.
+                Elle est partitionnée en sous-tables où chaque sous-table correspond à un sous-arbre de $p$.
                 Par exemple, nous pouvons apercevoir sur la figure précédente, la table de routage du noeud B (en rouge).
-                Elle est partitionnée en 2 sous-table (en bleu) contenant respectivement les noeuds C, D, E, F et G, H, I.
+                Elle est partitionnée en 2 sous-table (en bleu) contenant respectivement le sous-arbre de racine C et le sous-arbre de racine G.
             \item Acheminement de paquets\\
                 Quand un paquet est reçu,
                 \begin{itemize}
@@ -55,7 +55,7 @@
                         \[\frac{nombre\ de\ votes\ pour\ ce\ noeud}{nombre\ de\ noeuds\ participants\ \textrm{\textit{à l'élection}}}\]
                         Cest deux informations sont connues par la réception des beacons.
                         Si ce ratio est au-dessus d'un certain seuil (par défaut 90\%), ce noeud deviendra la racine.\footnote{
-                            Si plusieurs racines sont élues, deux réseaux \espmesh\ seront créés.
+                            Si plusieurs racines sont élues, deux réseaux \espmesh\ sont créés.
                             Dans ce cas, \espmesh\ possède un mécanisme interne (dont le fonctionnement n'est pas décrit par Espressif) qui va fusionner les deux réseaux
                             ssi les racines sont connectées au même routeur.
                         }

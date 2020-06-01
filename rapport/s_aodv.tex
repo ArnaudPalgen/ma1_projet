@@ -1,102 +1,119 @@
 \chapter{AODV}
-    Ad-hoc On-demand Distance Vector (AODV) est un protocole réactif à vecteur de distance.\\
-    Ce protocole définit 3 types de messages:
-    \begin{enumerate}
-        \item Route request (\textit{RREQs})
-        \item Route Remplies (\textit{RREPs})
-        \item Route Errors (\textit{RERRs})
-    \end{enumerate}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \underline{\textbf{Format des paquets}}\\
-        \textbf{RREQ}
-        \begin{figure}[H]
+    Ad-hoc On-demand Distance Vector (\aodv) est un protocole réactif à vecteur de distance.
+    Les 3 types de messages définis dans \aodv\ sont les Route requests (\textit{\rreq s}),
+    les Route Remplies (\textit{\rrep s}) et les Route Errors (\textit{\rrer s}).
+    Comme illustré sur la figure suivante, le premier sera envoyé en flooding par un noeud désirant obtenir une nouvelle route pour
+    une desination donnée. Le second sert de réponse au premier. Il est envoyé à l'émetteur du
+    \rreq. Et le dernier sert notamment lorsqu'un lien d'une route active est brisé. 
+    Nous détaillons plus bas ces mécanismes.
+    \vspace{1cm}
+    \begin{figure}[H]
         \centering
-            \begin{verbatimtab}
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     Type      |J|R|G|D|U|   Reserved          |   Hop Count   |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                            RREQ ID                            |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                    Destination IP Address                     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                  Destination Sequence Number                  |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                    Originator IP Address                      |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                  Originator Sequence Number                   |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            \end{verbatimtab}
-        \caption{format d'un paquet RREQ \cite{aodv_w}}
-        \label{rreqPaquet}
+        \includegraphics[scale=0.35]{images/aodv.png}
+        \caption{Illusration du fonctionnement d'AODV}
+        \label{aodv}
     \end{figure}
-    Où J,R,G,D,U sont des flags.
-        \newpage
-        \textbf{RREP}
-        \begin{figure}[H]
-            \centering
-                \begin{verbatimtab}
- 0                   1                   2                   3
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     Type      |R|A|    Reserved     |Prefix Sz|   Hop Count   |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                     Destination IP address                    |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                  Destination Sequence Number                  |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                    Originator IP address                      |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                           Lifetime                            |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                \end{verbatimtab}
-            \caption{format d'un paquet RREP \cite{aodv_w}}
-            \label{rreqPaquet}
-        \end{figure}
-        Où R et A sont des flags.
+    
+    
+    \vspace{0.5cm}
+    %\textbf{Format des paquets}\\
+    \section{Format des paquets}
+        \textbf{RREQ}\\
+            \begin{figure}[H]
+                \centering
+                \includegraphics[scale=0.5]{images/rreq.png}
+                \caption{Format d'un paquet \rreq\ \cite{aodv_w}}
+                \label{rreqPaquet}
+            \end{figure}
+            Le format d'un \rreq\ est illustré sur la figure précédente. Il contient les champs
+            repris dans la table suivante:\\
+            \begin{table}[H]
+                \begin{tabular}{ll}
+                    type & \makecell[l]{$=1$}\\\hline
+                    J R G & \makecell[l]{flags}\\\hline
+                    D  & \makecell[l]{flag indiquant que seul la destination peut\\ répondre au \rreq}\\\hline
+                    U & \makecell[l]{flag indiquant que le numéro de séquence de la\\ destination est inconnu}\\\hline
+                    Hop count & \makecell[l]{nombre de sauts depuis le noeud source}\\\hline
+                    \rreq\ \textsc{id} & \makecell[l]{numéro de séquence identifiant le \rreq}\\\hline
+                    Destination IP Address & \makecell[l]{adresse \textsc{ip} du noeud pour lequel la route\\ est demandée}\\\hline
+                    Destination Sequence Number & \makecell[l]{le dernier numéro de séquence connu pour une \\route vers la destination}\\\hline
+                    Originator IP Address & \makecell[l]{adresse ip de l'émetteur du \rreq}\\\hline
+                    Originator Sequence Number & \makecell[l]{numéro de séquence à utiliser pour une route\\ pointant vers l'émetteur du \rreq}\\
+                \end{tabular}
+                \caption{Champs d'un \rreq}
+                \label{rreq_fields}
+            \end{table}
+            
+        \textbf{RREP}\\
+            \begin{figure}[H]
+                \centering
+                \includegraphics[scale=0.5]{images/rrep.png}
+                \caption{Format d'un \rrep\ \cite{aodv_w}}
+                \label{rreqPaquet}
+            \end{figure}
+            Le format d'un \rrep\ est illustré sur la figure précédente. Il contient les champs
+            repris dans la table suivante:\\
+            \begin{table}[H]
+                \begin{tabular}{ll}
+                    type & \makecell[l]{$=2$}\\ \hline
+                    R & \makecell[l]{flag utilisé pour le multicast}\\ \hline
+                    Prefix size & \makecell[l]{utilisé pour les aggrégations de routes}\\ \hline
+                    Hop Count & \makecell[l]{nombre de sauts de l'\textit{originator} à la destination}\\ \hline
+                    Destination IP address & \makecell[l]{adresse IP de du noeud pour qui l'adresse \\est demandée}\\ \hline
+                    Destination Sequence Number & \makecell[l]{numéro de séquence de destination \\associé à la route}\\ \hline
+                    Originator IP address & \makecell[l]{adresse IP du noeud émetteur du \rreq}\\ \hline
+                    Lifetime & \makecell[l]{temps (en ms) pendant lequel le noeud qui reçoit \\le \rrep\ va considérer la route valide}\\
+                \end{tabular}
+                \caption{Champs d'un \rrep}
+                \label{rrep_fields}
+            \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \underline{\textbf{Découverte d'un chemin}}\\
-        La découverte d'un chemin est intiée par un noeud voulant envoyer des paquets à une destination pour laquelle il n'a aucune information.\\
-        Chaque noeud possède deux compteurs: \textbf{\textit{sequence\_number}} et \textbf{\textit{rreq\_id}}.\\
+    %\textbf{Découverte d'un chemin}\\
+    \section{Découverte d'un chemin}
+        La découverte d'un chemin est intiée par un noeud voulant envoyer des paquets à une destination pour laquelle il n'a aucune route valide.
+        Chaque noeud possède deux compteurs: \textit{sequence\_number} et \textit{rreq\_id}.
         
-        \textbf{Génération du \textit{RREQ}}\\
-            Le noeud source incrémente ses compteurs \textbf{\textit{sequence\_number}} et \textbf{\textit{rreq\_id}} de 1.
-            Il envoie ensuite un \textit{RREQ} en broadcast à ses voisins.\\
         
-        \textbf{Propagation du \textit{RREQ}}\\
-        \begin{itemize}
-            \item[$\bullet$] \underline{Noeud intermédiaire}\\
-                A la réception d'un \textit{RREQ}, un noeud intermédiaire va pouvoir rajouter ou mettre à jour
-                les routes vers le noeud source du \textit{RREQ} et vers son prédécesseur.\\
-                Ensuite deux situations sont possibles:
-                \begin{enumerate}
-                    \item Le noeud courant possède une route active vers la destination et le numéro de séquence de la route est plus grand 
-                        ou égal au numéro de séquence de la destination dans le \textit{RREQ}.\\
-                        Dans ce cas, il peut envoyer par unicast un \textit{RREP} à la source du \textit{RREQ}
-                    \item La condition en 1. n'est pas satisfaite.\\
-                        Dans ce cas, le noeud va incrémenter le nombre de sauts du \textit{RREQ} et le propager à ses voisins.\\
-                \end{enumerate}
-                
+        \vspace{0.5cm}
+        \textbf{Génération du RREQ}\\
+            Le noeud source incrémente ses compteurs \textit{sequence\_number} et \textit{rreq\_id} de 1.
+            Il envoie ensuite un \rreq\ en broadcast à ses voisins.
+        
+        
+        \vspace{0.5cm}
+        \textbf{Propagation du RREQ}\\
+            \begin{itemize}
+                \item[$\bullet$] Noeud intermédiaire\\
+                    A la réception d'un \rreq, un noeud intermédiaire va pouvoir rajouter ou mettre à jour
+                    les routes vers son prédécesseur et vers le noeud source du \rreq.\\
+                    Ensuite deux situations sont possibles:
+                    \begin{enumerate}
+                        \item Le noeud courant possède une route active vers la destination et le numéro de séquence de la route est plus grand 
+                            ou égal au numéro de séquence de la destination dans le \rreq.
+                            Dans ce cas, il peut envoyer par unicast un \rrep\ à la source du \rreq.
+                        \item Sinon\\
+                            Le noeud va incrémenter le nombre de sauts du \rreq\ et le propager à ses voisins.
+                    \end{enumerate}
 
-            \item[$\bullet$] \underline{Noeud destination}\\
-                A la réception d'un \textit{RREQ} lui étant destiné, un noeud va, comme un noeud intermédiaire, 
-                rajouter ou mettre à jour les routes vers le noeud source du \textit{RREQ} et vers son prédécesseur.\\
-                Si le \textbf{\textit{Destination Sequence Number}} du \textit{RREQ} est égale à son \textbf{\textit{sequence\_number}},
-                il va incrémenter ce dernier et envoyer un \textit{RREP} en unicast vers la source du \textit{RREQ}.\\
-             
-        \end{itemize}
+                \item[$\bullet$] Noeud destination\\
+                    A la réception d'un \rreq\  lui étant destiné, un noeud va, comme un noeud intermédiaire, 
+                    rajouter ou mettre à jour les routes vers son prédécesseur et vers le noeud source du \rreq.
+                    Si le \textit{Destination Sequence Number} du \rreq\ est égal à son \textit{sequence\_number},
+                    il va incrémenter ce dernier et envoyer un \rrep\ en unicast vers la source du \rreq.     
+            \end{itemize}
 
-
-        \textbf{Propagation du \textit{RREP}}\\
-            A la réception d'un \textit{RREP}, un noeud va pouvoir rajouter ou mettre à jour
-            les routes vers le noeud source du \textit{RREP} et vers son successeur.\\
-            Il va ensuite incrémenter le nombre de sauts du \textit{RREP} et le propager en unicast vers la destination de ce \textit{RREP}.\\
+        \vspace{0.5cm}
+        \textbf{Propagation du RREP}\\
+            A la réception d'un \rrep\ , un noeud va pouvoir rajouter ou mettre à jour
+            les routes vers le noeud source du \rrep\  et vers son successeur.\\
+            Il va ensuite incrémenter le nombre de sauts du \rrep\  et le propager en unicast vers la destination de ce \rrep\ .
+            Cette propagation en unicast vers la source du \rreq\ est possible par l'apprentissage de la route inverse
+            (destination du \rreq\ vers l'émetteur du \rreq) réalisée lors du flooding du \rreq.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \underline{\textbf{Table de routage}}\\
+    %\underline{\textbf{Table de routage}}\\
+    \section{Table de routage}
         Chaque entrée d'une table de routage contient les informations suivantes:
         
         \begin{table}[H]
@@ -107,7 +124,7 @@
                 \textit{dest\_SN}   & Numéro de séquence de destination\\
                 \textit{flag}       & Indicateur de numéro de séquence de destination valide\\
                 \textit{out}        & Interface réseau\\
-                \textit{hops}       & Comptage de sauts (nombre de sauts nécessaires pour atteindre la destination)\\
+                \textit{hops}       & \makecell[l]{Comptage de sauts (nombre de sauts nécessaires\\ pour atteindre la destination)}\\
                 \textit{next-hop}   & Prochain saut\\
                 \textit{precursors} & Liste des précurseurs\\
                 \textit{lifetime}   & temps d'expiration ou de suppression de l'itinéraire\\
@@ -132,21 +149,22 @@
         \textbf{Gestion du \textit{lifetime}}\\
             Le temps de vie d'une route dans la table de routage est initialisé à \textit{active\_route\_timeout} (3 millisecondes).\\
             Quand ce timer expire, la route passe de active à inactive. Une route inactive ne pourra plus être utilisée pour transférer des données
-            mais pourra fournir des informations pour de futurs \textit{RREQ} et la réparation de routes.\\
+            mais pourra fournir des informations pour de futurs \rreq\  et la réparation de routes.\\
             Quand une route est utilisée, son temps de vie  est actualisé à: $current time + active\_route\_timeout$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \vspace{1cm}
-    \underline{\textbf{Evitement de boucles}}\\
+    \vspace{0.5cm}
+    \textbf{Evitement de boucles}\\
         A priori les numéros de séquences suffisent pour éviter les boucles. Cependant, d'après \cite{loop_aodv_w}, il y a des
         ambiguités dans le RFC \cite{aodv_w}. Dû à ces ambiguités, l'implémentation pourrait introduire des boucles.
         %Certaines parties du RFC concerant la gestion des numéros de séquences pourraient introduiredes boucles. 
         Nous approfondirons la lecture de cet article si nous choisissons ce protocole afin d'éviter les boucles dans notre implémentation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \underline{\textbf{Défaillance d'un lien}}\\
-        Un noeud faisant partie d'une route active broadcast des messages \textit{hello} (RREP)
+    \vspace{0.5cm}
+    \textbf{Défaillance d'un lien}\\
+        Un noeud faisant partie d'une route active broadcast des messages \textit{hello} (\rrep)
         régulièrement.\\
         Si un noeud ne reçoit pas de message durant un certain temps pour un voisin, il va considérer
         que le lien avec ce voisin est perdu.\\
-        Dans ce cas, il va en informé ses voisins impactés par un RERR.
+        Dans ce cas, il va en informé ses voisins impactés par un \textsc{rrer}.
