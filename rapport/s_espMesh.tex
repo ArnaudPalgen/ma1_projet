@@ -1,5 +1,5 @@
 \chapter{ESP MESH}
-        \espmesh\ est le protocole du constructeur Espressif permettant d'établir un réseau mesh avec des \esp.
+        E\textsc{sp-mesh} est le protocole du constructeur Espressif permettant d'établir un réseau mesh avec des \esp.
         Cette section explique le fonctionnement de ce protocole. \espmesh\ a pour objectif la création d'un arbre recouvrant.
         Il existe plusieurs types de noeuds:
         \begin{enumerate}
@@ -13,18 +13,24 @@
         \begin{figure}[H]
             \centering
             \includegraphics[scale=0.3]{images/mesh-node-types.png}
-            \caption{Topologie d'un réseau \espmesh \cite{esp-mesh_w}}
+            \caption{Topologie d'un réseau \espmesh \cite{esp-mesh}}
         \end{figure}
 
-        \textbf{Routage}\newline
-        \begin{itemize}
-            \item Table de routage\\
+        %\textbf{Routage}\newline
+        \section{Routage}
+        %\begin{itemize}
+            %\item \textbf{Table de routage}\\
+            \textbf{Table de routage}\\
                 Chaque noeud possède sa table de routage. Soit $p$ un noeud, sa table de routage contient les adresses \mac\ 
                 des noeuds du sous-arbre ayant $p$ comme racine, et également celle de $p$.\\
                 Elle est partitionnée en sous-tables où chaque sous-table correspond à un sous-arbre de $p$.
                 Par exemple, nous pouvons apercevoir sur la figure précédente, la table de routage du noeud B (en rouge).
                 Elle est partitionnée en 2 sous-table (en bleu) contenant respectivement le sous-arbre de racine C et le sous-arbre de racine G.
-            \item Acheminement de paquets\\
+            %%\item \textbf{Acheminement de paquets}\\
+            \newline
+
+
+            \textbf{Acheminement de paquets}\\
                 Quand un paquet est reçu,
                 \begin{itemize}
                     \item Si l'adresse \mac\ du paquet est dans la table de routage et si elle est différente de l'adresse du noeud l'ayant reçu, le paquet est envoyé
@@ -33,11 +39,13 @@
                 \end{itemize}
                 %\espmesh\ utilise un mécanisme de vérification de chemin pour détecter les boucles. Si une boucle arrive, un parent va prévenir son enfant et initier une déconnexion.
 
-        \end{itemize}
-        \vspace{0.5cm}
+        %\end{itemize}
+        %\vspace{0.5cm}
 
-        \textbf{Construction d'un réseau}
-        \newline
+        %\textbf{Construction d'un réseau}
+        %\newline
+        \section{Construction d'un réseau}
+        \textbf{Mise sous tension synchrone}\\
         \begin{enumerate}
             \item \'Election de la racine
                 \begin{itemize}
@@ -119,7 +127,7 @@
             \begin{enumerate}
                 \item Si le noeud détecte, par les beacons, qu'une racine existe déjà, il ne vas pas essayer
                     d'élire une nouvelle racine
-                    même si son \rssi\ avec le routeur est meilleur. Il va rejoindre le réseau comme un noeud idle. \\
+                    même si son \rssi\ avec le routeur est meilleur. Il va rejoindre le réseau comme un noeud idle.\\
                     Si le noeud est la racine désignée, tous les autres noeuds vont rester idle
                     jusqu'à ce que le noeud soit mis sous tension.
                 \item Si le noeud devient un noeud intermédiraire, il peut devenir le meilleur parent d'un autre noeud 
@@ -127,10 +135,11 @@
                 \item Si un noeud idle a un parent prédéfini et que ce noeud n'est pas sous tension, il ne va pas essayer
                 de se connecter à un autre parent.
             \end{enumerate}
-        \vspace{0.5cm}
+        %\vspace{0.5cm}
+        \section{Gestion du réseau}
         \textbf{Défaillance d'un noeud}\newline
             \begin{itemize}
-                \item Défaillance de la racine\\
+                \item Défaillance de la racine\label{root_fail}\\
                     Si la racine tombe, les noeuds de la deuxième couche vont d'abord tenter de s'y reconnecter.
                     Après plusieurs échecs, les noeuds de la deuxième couche vont entamer entre eux le processus d'élection d'une nouvelle racine.
                     Si la racine ainsi que plusieurs couches tombent, le processus d'élection sera initialisé sur la couche la plus haute.
@@ -143,29 +152,30 @@
                     \begin{figure}[H]
                         \centering
                         \includegraphics[scale=0.5]{images/mesh-parent-node-failure.png}
-                        \caption{Défaillance d'un noeud intermédiaire\cite{esp-mesh_w}}
+                        \caption{Défaillance d'un noeud intermédiaire\cite{esp-mesh}}
                     \end{figure}
             \end{itemize}
             \vspace{0.5cm}
             \textbf{Changement de racine}\newline
                 Un changement de racine n'est possible que dans deux situations:
                 \begin{enumerate}
-                    \item La racine tombe. (voir point précédent)
+                    \item La racine tombe. \hyperref[root_fail]{(voir point précédent)}
                     \item La racine le demande via un appel à \textbf{esp\_mesh\_waive\_root()}.
                         Dans ce cas, un processus d'élection de racine sera initialisé. La nouvelle racine élue
                         enverra alors une \textit{switch request} à la racine actuelle qui répondra par un acquittement.
                         Ensuite la nouvelle racine se déconnectera de son parent et se connectera au routeur.
                         L'ancienne racine se déconnectera du routeur et deviendra un noeud idle pour enfin se connecter à un nouveau parent.
                 \end{enumerate}
-        \textbf{Paquets ESP-MESH}\\
+        %\textbf{Paquets ESP-MESH}\\
+        \section{Paquets ESP-MESH}
             Les paquets \espmesh\ sont contenus dans une trame \wifi. Une transmission multi-sauts utilisera un paquet \espmesh\ transporté 
             entre chaque noeud par une trame \wifi\ différente.
             La figure \ref{fig_meshPacket} montre la structure d'un paquet \espmesh:\\
 
-            \begin{figure}[h]
+            \begin{figure}[H]
                 \centering
                 \includegraphics[scale=0.5]{images/mesh-packet.png}
-                \caption{Paquet \espmesh\ \cite{esp-mesh_w}}
+                \caption{Paquet \espmesh\ \cite{esp-mesh}}
                 \label{fig_meshPacket}
             \end{figure}
             Le header d'un paquet \espmesh\ contient les adresses source et destination ainsi que diverses options.
@@ -173,8 +183,10 @@
 
             Dans le cas où l'adresse de destination est une adrese \textsc{ip}, le paquet sera envoyé à la racine du réseau
             \espmesh\ qui transmet le payload du paquet (par exemple en initiant une connexion tcp avec un socket).
-        \vspace{0.5cm}\\
-        \textbf{Contrôle de flux}\\
+        %\vspace{0.5cm}\\
+        %\textbf{Contrôle de flux}\\
+        \section{Contrôle de flux}
+        \label{compute_windowSize}
             Pour éviter que les parents soient submergés de flux venant de leurs enfants, chaque parent va
             assigner une fenêtre de réception à chaque enfant. Chaque noeud enfant doit demander une fenêtre
             de réception avant chaque transmission. La taille de la fenêtre peut être ajustée dynamiquement.
@@ -185,8 +197,9 @@
                     La comparaison est utilisée pour calculer la taille de la fenêtre qui est transmise à l'enfant.\footnote{Ce calcul n'est pas précisé par Espressif}
                 \item L'enfant transmet le paquet conformément à la taille de fenêtre spécifiée par le parent. Une fois la fenêtre de réception utilisée, l'enfant doit renvoyer une demande de fenêtre.
             \end{enumerate}
-        \vspace{0.5cm}
-        \textbf{Performances}\\
+        %\vspace{0.5cm}
+        %\textbf{Performances}\\
+        \section{Performances}
             Espressif fournit les performances d'\espmesh\ pour un réseau de maximum 100 noeuds, 6 couches et
             un nombre d'enfants par noeud de 6 (voir table \ref{performances_espMesh}).
             \begin{table}[H]
@@ -196,11 +209,12 @@
                     Latence par saut & 10 à 30 millisecondes\\ \hline
                     Temps de réparation du réseau & \makecell{Si la racine tombe: $<$ 10 secondes \\ Si un noeud enfant tombe: $<$ 5 secondes}\\ \hline
                 \end{tabular}
-                \caption{Performances d'\espmesh\ \cite{esp-mesh_w}}
+                \caption{Performances d'\espmesh\ \cite{esp-mesh}}
                 \label{performances_espMesh}
             \end{table}
-            \hspace{-0.75cm}
-            \textbf{Discussion}\\
+            %\hspace{-0.75cm}
+            %\textbf{Discussion}\\
+            \section{Discussion}
             A première vue, une topologie en arbre n'est pas robuste car si la racine tombe,
             tout le reste du réseau est déconnecté. Cependant le processus d'élection
             d'une nouvelle racine semble efficace selon les résulats fournis par Espressif.

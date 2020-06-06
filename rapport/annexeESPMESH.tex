@@ -1,0 +1,32 @@
+\textbf{Multicasting}\\
+    Le multicasting permet d'envoyer simultanément un paquet \espmesh\ à plusieurs noeuds du réseau. Le multicasting
+    peut être réalisé en spécifiant
+    \begin{itemize}
+        \item Soit un ensemble d'adresses \mac\\
+            Dans ce cas, l'adresse de destination doit être
+            {\fontfamily{qcr}\selectfont \textls[-300]{\small 0 1 : 0 0 : 5 E : x x : x x : x x}}
+            Cela signifie que le paquet est un paquet multicast et que la liste des adresses peut être obtenue dans les options du header.
+        \item Soit un groupe préconfiguré de noeuds\\
+            Dans ce cas, l'adresse de destination du paquet doit être l'ID\footnote{Dans un réseau \espmesh, chaque groupe a un ID unique
+            ayant la même structure qu'une adresse mac (par exmple {\small 7 7 : 7 7 : 7 7 : 7 7 : 7 7 : 7 7})}
+            du groupe et un flag \textsc{mesh\_data\_group} doit être ajouté. % todo ajouté où ?
+            % todo comment les noeuds sont au courant qu'ils sont dans ce groupe
+    \end{itemize}
+
+\vspace{0.5cm}
+\textbf{Broadcasting}\\
+    Le broadcasting permet de transmettre un paquet \espmesh\ à tous les noeuds du réseau. Pour éviter de gaspiller de
+    la bande passante, \espmesh\ utilise les règles suivantes:
+    \begin{enumerate}
+        \item Quand un noeud intermédiare reçoit un paquet broadcast de son parent, il va le transmettre à tous ses enfants
+            et en stocker une copie
+        \item Quand un noeud intermédiaire est la source d'un paquet broadcast, il va le transmettre à son parent et à ses enfants
+        \item Quand un noeud intermédiaire reçoit un paquet d'un de ses enfants, il va le transmettre à ses autres enfants, son parent
+            et en stocker une copie
+        \item Quand une feuille est la source d'un paquet broadcast, elle va le transmettre à son parent
+        \item Quand la racine est la source d'un paquet broadcast, elle va le transmettre à ses enfants
+        \item Quand la racine reçoit un paquet broadcast de l'un de ses enfants, elle va le transmettre à ses autres enfants et en stocker une copie
+        \item Quand un noeud reçoit un paquet broadcast avec son adresse \mac\ comme adresse source, il l'ignore
+        \item Quand un noeud intermédiaire reçoit un paquet broadcast de son parent, s'il possède une copie de ce paquet (càd que ce paquet a été à l'origine transmis par l'un de ses enfants), il va l'ignorer
+            pour éviter les cycles ( protocole d'inondation)
+    \end{enumerate}

@@ -8,7 +8,7 @@
         \centering
         \includegraphics[scale=0.3]{images/esp32-devkitc.jpg}
         \caption{ESP32-DevKitC V4 with ESP32-WROOM-32 module
-            \cite{esp32-gettingStarted_w}}
+            \cite{esp32-gettingStarted}}
         \label{esp32_img}
     \end{figure}
     Comme dit plus haut, les noeuds de notre réseau sont des \esp.
@@ -36,18 +36,18 @@
                 pulse counter, GPIO, capacitive touch sensor, ADC, DAC}\\ \hline
             \makecell{Tension de \\fonctionnement} & $3.0V \sim 3.6V$\\ \hline
         \end{tabular}
-        \caption{Spécification de l'\esp\textsc{-wroom32} \cite{esp32WROOM_datasheet}}
+        \caption{Spécification de l'\esp\textsc{-wroom32} \cite{esp32-WROOM-32-datasheet}}
         \label{spec}
     \end{table}
     \textbf{Schéma-bloc}
     \begin{figure}[H]
         \centering
         \includegraphics[scale=0.15]{images/esp32-blockDiagram.png}
-        \caption{Schéma-bloc \cite{esp32_datasheet}}
+        \caption{Schéma-bloc \cite{esp32-datasheet}}
         %\label{}
     \end{figure}
 
-    \textbf{Mémoire}\cite{esp32WROOM_datasheet}\\
+    \textbf{Mémoire}\cite{esp32-WROOM-32-datasheet}\\
         La mémoire interne inclut:
         \begin{itemize}
             \item 448 KB de ROM pour le démarrage et les fonctions de base
@@ -76,7 +76,7 @@
             Hibernation & RTC timer only & $5\mu A$\\ \hline
             Power off & - & $0.1 \mu A$\\ \hline
         \end{tabular}
-        \caption{Consommation par mode \cite{esp32_datasheet}}
+        \caption{Consommation par mode \cite{esp32-datasheet}}
         \label{Consumption_PowerModes}
         
     \end{table}
@@ -103,14 +103,14 @@
 \section{Environnement de développement}
     Trois environnements s'offrent à nous:
     \begin{enumerate}
-        \item \textbf{MicroPython}\\
-            Selon le site officiel de MicroPython\cite{micropython_w}, MicroPython
+        \item \textbf{MicroPython}\cite{micropython}\\
+            Selon le site officiel de MicroPython, MicroPython
             est une implémentation simple et efficace de Python 3 incluant un
             petit sous-ensemble de la bibliothèque standard Python. Il est
             optimisé pour fonctionner sur des microcontrôleurs, open source et facile à utiliser.
             La documentation est complète et de nombreux tutoriels sont disponible et facilement compréhensible.
             Cependant, MicroPython n'expose pas les fonctions de bas niveau utiles pour ce projet.
-            Par exemple il serait difficile d'envoyer des paquets au niveau de la
+            Par exemple il semble difficile d'envoyer des paquets au niveau de la
             couche lisaison de données ou encore, d'avoir accès aux tables de routages \textsc{ip}.\\
             Voici un exemple illustrant la simplicité du langage. Cet exemple permet de faire clignoter
             une led branchée au \textsc{gpio} 23.
@@ -125,7 +125,7 @@ while(TRUE):
     time.sleep(2)
             \end{minted}
         
-        \item \textbf{IoT Development Framework (IDF)}\\
+        \item \textbf{IoT Development Framework (IDF)}\cite{idf}\\
             IDF est l'environnement du constucteur de l'\esp\ (Espressif).
             La documentation est complète mais le code source n'est pas entièrement
             disponible. Pour certaines parties du framework, nous n'avons accès qu'aux
@@ -134,8 +134,8 @@ while(TRUE):
             Cet environnement nous donne aussi accès à des fonctionnalités de FreeRTOS
             (free real-time operating system), un système d'exploitation temps
             réel open source pour microcontrôleurs. Ses fonctionnalités pourront nous être 
-            utiles pour ce projet.
-            des protocoles tel que \espmesh\ ou
+            utiles pour ce projet. 
+            Des protocoles tel que \espmesh\ ou
             \espnow\ sont également disponible. Ils faciliteraient la mise en place d'un réseau \mesh.
             Voici un exemple de code permettant de faire clignoter une led.
             \begin{minted}[frame=lines,framesep=2mm,baselinestretch=1.2,bgcolor=myGray,fontsize=\footnotesize, linenos]{c}
@@ -165,12 +165,12 @@ while(TRUE):
                 }
             }
             \end{minted}
-        \item \textbf{Arduino}\\
+        \item \textbf{Arduino}\cite{aruino-esp32}\\
             L'environnement Arduino se base sur IDF. Il est donc possible que certaines
             fonctionnalités d'IDF ne soient pas disponible. 
             La documentation est moins complète qu'IDF mais tout le code source est disponible.
-            Cet environnement semble assez bas niveau car nous avons accès au driver Ethernet
-            et à la couche \textsc{ip}.
+            Comme MicroPython, il semble difficile d'envoyer des paquets au niveau de la
+            couche lisaison de données ou d'avoir accès aux tables de routages \textsc{ip}.\\
             \begin{minted}[frame=lines,framesep=2mm,baselinestretch=1.2,bgcolor=myGray,fontsize=\footnotesize, linenos]{c}
 #define LED  2
  
@@ -188,10 +188,13 @@ while(TRUE):
             \end{minted}
     \end{enumerate}
     \vspace{1cm}
-    Il est évident que nous ne choisirons pas MicroPython car certaines fonctionnalités utiles
-    pour ce projet ne sont pas accessibles.\\
-    Nous choisirons IDF pour sa documentation complète, sa nativité et l'accès aux
-    fonctionnalités de FreeRTOS.
+    Notons que les solutions évoquées ci-dessus sont gratuites. Il existe des solutions
+    commerciales payantes que nous n'avons pas évoqué car il est tout a fait possible de
+    travailler avec des solutions gratuites.\\
+    
+    Nous choisirons IDF pour sa documentation complète, sa nativité et pour son ensemble
+    de fonctionnalités plus exhaustif que les autres environnements. Néanmoins, 
+    avec les extraits de code, nous remarquons qu'il sera plus difficile à prendre en mains.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Protocoles de routage}
@@ -222,20 +225,20 @@ while(TRUE):
     Il existe une multitude de protocols de routage \mesh.
     Ci-dessous, en voici quelques-uns souvent cités dans la littérature:\\
     \begin{itemize}
-        \item \textbf{AODV}\cite{aodv_w} Ad-hoc On-demand Distance Vector\\
+        \item \textbf{AODV}\cite{rfc_aodv} Ad-hoc On-demand Distance Vector\\
             Protocole réactif à vecteur de distance que nous décrirons en détail par la suite.\\
-        \item \textbf{DSR}\cite{dsr_w} Dynamic Source Routing\\
+        \item \textbf{DSR}\cite{rfc_dsr} Dynamic Source Routing\\
             Similaire à AODV mais ici, les paquets servant à la découverte d'un chemin
             (\textit{RREQ}) contiennent tous les sauts de ce chemin.\\
-        \item \textbf{OLSR}\cite{olsr_w} Optimized Link State Routing\\
+        \item \textbf{OLSR}\cite{rfc_olsr} Optimized Link State Routing\\
             Protocole proactif à état de liens. Dans ce protocole, certains noeuds servent de relais pour effectuer
             le broadcasting des paquets servant à la découverte de chemins. L'ensemble de ces noeuds forme un arbre couvrant du réseau.\\
-        \item \textbf{B.A.T.M.A.N}\cite{batman_w} Better Approach to Mobile Adhoc Networking\\
+        \item \textbf{B.A.T.M.A.N}\cite{batman} Better Approach to Mobile Adhoc Networking\\
             Protocole proactif à état de liens. Le protocole ne calcule
             pas le chemin pour atteindre un noeud mais le meilleur saut dans la bonne direction.
             Pour cela, pour chaque destination il va sélectionner son voisin qui lui a transmis
             le plus de messages de cette destination.\\
-        \item \textbf{DSDV}\cite{dsdv_w} Destination Sequence Distance Vector\\
+        \item \textbf{DSDV}\cite{dsdv} Destination Sequence Distance Vector\\
             Protocole à vecteur de distance basé sur l'algorithme de Bellman-Ford.
     \end{itemize}
 

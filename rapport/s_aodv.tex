@@ -1,8 +1,9 @@
 \chapter{AODV}
     Ad-hoc On-demand Distance Vector (\aodv) est un protocole réactif à vecteur de distance.
     Les 3 types de messages définis dans \aodv\ sont les Route requests (\textit{\rreq s}),
-    les Route Remplies (\textit{\rrep s}) et les Route Errors (\textit{\rrer s}).
-    Comme illustré sur la figure suivante, le premier sera envoyé en flooding par un noeud désirant obtenir une nouvelle route pour
+    les Route Remplies (\textit{\rrep s}) et les Route Errors (\textit{\rerr s}).
+    Comme illustré sur la figure suivante, le premier sera envoyé en flooding par un noeud
+    désirant obtenir une nouvelle route pour
     une desination donnée. Le second sert de réponse au premier. Il est envoyé à l'émetteur du
     \rreq. Et le dernier sert notamment lorsqu'un lien d'une route active est brisé. 
     Nous détaillons plus bas ces mécanismes.
@@ -22,7 +23,7 @@
             \begin{figure}[H]
                 \centering
                 \includegraphics[scale=0.5]{images/rreq.png}
-                \caption{Format d'un paquet \rreq\ \cite{aodv_w}}
+                \caption{Format d'un paquet \rreq\ \cite{rfc_aodv}}
                 \label{rreqPaquet}
             \end{figure}
             Le format d'un \rreq\ est illustré sur la figure précédente. Il contient les champs
@@ -40,7 +41,7 @@
                     Originator IP Address & \makecell[l]{adresse ip de l'émetteur du \rreq}\\\hline
                     Originator Sequence Number & \makecell[l]{numéro de séquence à utiliser pour une route\\ pointant vers l'émetteur du \rreq}\\
                 \end{tabular}
-                \caption{Champs d'un \rreq}
+                \caption{Champs d'un \rreq\ \cite{rfc_aodv}}
                 \label{rreq_fields}
             \end{table}
             
@@ -48,7 +49,7 @@
             \begin{figure}[H]
                 \centering
                 \includegraphics[scale=0.5]{images/rrep.png}
-                \caption{Format d'un \rrep\ \cite{aodv_w}}
+                \caption{Format d'un \rrep\ \cite{rfc_aodv}}
                 \label{rreqPaquet}
             \end{figure}
             Le format d'un \rrep\ est illustré sur la figure précédente. Il contient les champs
@@ -64,11 +65,10 @@
                     Originator IP address & \makecell[l]{adresse IP du noeud émetteur du \rreq}\\ \hline
                     Lifetime & \makecell[l]{temps (en ms) pendant lequel le noeud qui reçoit \\le \rrep\ va considérer la route valide}\\
                 \end{tabular}
-                \caption{Champs d'un \rrep}
+                \caption{Champs d'un \rrep\ \cite{rfc_aodv}}
                 \label{rrep_fields}
             \end{table}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %\textbf{Découverte d'un chemin}\\
     \section{Découverte d'un chemin}
         La découverte d'un chemin est intiée par un noeud voulant envoyer des paquets à une destination pour laquelle il n'a aucune route valide.
@@ -111,7 +111,6 @@
             Cette propagation en unicast vers la source du \rreq\ est possible par l'apprentissage de la route inverse
             (destination du \rreq\ vers l'émetteur du \rreq) réalisée lors du flooding du \rreq.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %\underline{\textbf{Table de routage}}\\
     \section{Table de routage}
         Chaque entrée d'une table de routage contient les informations suivantes:
@@ -130,7 +129,7 @@
                 \textit{lifetime}   & temps d'expiration ou de suppression de l'itinéraire\\
                 \hline
             \end{tabular}
-            \caption{entrée d'une table de routage \aodv \cite{aodv_w}}
+            \caption{entrée d'une table de routage \aodv \cite{rfc_aodv}}
             \label{routingTable_aodv}
         \end{table}
 
@@ -152,19 +151,26 @@
             mais pourra fournir des informations pour de futurs \rreq\  et la réparation de routes.\\
             Quand une route est utilisée, son temps de vie  est actualisé à: $current time + active\_route\_timeout$
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \vspace{0.5cm}
-    \textbf{Evitement de boucles}\\
-        A priori les numéros de séquences suffisent pour éviter les boucles. Cependant, d'après \cite{loop_aodv_w}, il y a des
-        ambiguités dans le RFC \cite{aodv_w}. Dû à ces ambiguités, l'implémentation pourrait introduire des boucles.
+    %\vspace{0.5cm}
+    %\textbf{Evitement de boucles}\\
+    \section{Evitement de boucles}
+        A priori les numéros de séquences suffisent pour éviter les boucles. Cependant, d'après \cite{loop_aodv}, il y a des
+        ambiguités dans le RFC \cite{rfc_aodv}. Dû à ces ambiguités, l'implémentation pourrait introduire des boucles.
         %Certaines parties du RFC concerant la gestion des numéros de séquences pourraient introduiredes boucles. 
         Nous approfondirons la lecture de cet article si nous choisissons ce protocole afin d'éviter les boucles dans notre implémentation.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \vspace{0.5cm}
-    \textbf{Défaillance d'un lien}\\
+        %\vspace{0.5cm}
+    %\textbf{Défaillance d'un lien}\\
+    \section{Défaillance d'un lien}
         Un noeud faisant partie d'une route active broadcast des messages \textit{hello} (\rrep)
         régulièrement.\\
         Si un noeud ne reçoit pas de message durant un certain temps pour un voisin, il va considérer
         que le lien avec ce voisin est perdu.\\
-        Dans ce cas, il va en informé ses voisins impactés par un \textsc{rrer}.
+        Dans ce cas, il va en informé ses voisins impactés par un \textsc{rerr}.
+    
+    \section{Discussion}
+        Ce protocole semble plus robuste que \espmesh. Car en comparaison avec ce dernier, si un noeud tombe,
+        les noeuds peuvent trouver une autre route pour envoyer des pauqtes d'un point à un autre.
+        A priori cette robustesse dépend également de certains paramètre comme le temps de vie ou la fréquence
+        d'émission des messages \textit{hello}.
+        

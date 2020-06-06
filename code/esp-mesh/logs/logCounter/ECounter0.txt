@@ -1,0 +1,259 @@
+dev/ttyUSB0 monitor
+Checking Python dependencies...
+Python requirements from /home/arnaud/esp/esp-idf/requirements.txt are satisfied.
+Running idf_monitor in directory /home/arnaud/Dropbox/Cours2019-2020/projet/projet_ma1/code/internal_communication
+Executing "/usr/bin/python /home/arnaud/esp/esp-idf/tools/idf_monitor.py -p /dev/ttyUSB0 -b 115200 /home/arnaud/Dropbox/Cours2019-2020/projet/projet_ma1/code/internal_communication/build/internal_communication.elf -m '/usr/bin/python' '/home/arnaud/esp/esp-idf/tools/idf.py' '-p' '/dev/ttyUSB0'"...
+--- idf_monitor on /dev/ttyUSB0 115200 ---
+--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
+et�R�� ���1����2���S�
+r.��� (P�U�ON��E�JI�o�'�E3�i�}AS�e1AS�%=OTJC���˥��ip'�b �U]�:���5
+��}�r�'��0�\E���0x�,�E�v:��0,c.��r�'�A0�
+���d:��fff�1,����67����0 �XZ            }�r�'�A0�}dr�'��0C�닕�DI����k V�i2�!�+��0x���A0�bb���4
+���d:��007�0�lYK�20�j       ���r贈4
+h������ �&��o��j
+l�X��x����4�,��i67�j
+en��0���0�j
+�ښ�m�B��)����� ChZ�RevZ.��� 1+j5
+�+ښ2�RB�5���t��������p ���si�� 1,j��.��닱��d�.�i����i�Z�K�Z[�[�I (42) boot: ESP-IDF v3.3.1 2nd stage bootloader
+I (42) boot: compile time 10:38:23
+I (42) boot: Enabling RNG early entropy source...
+I (47) boot: SPI Speed      : 40MHz
+I (51) boot: SPI Mode       : DIO
+I (55) boot: SPI Flash Size : 2MB
+I (59) boot: Partition Table:
+I (62) boot: ## Label            Usage          Type ST Offset   Length
+I (70) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (77) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (85) boot:  2 factory          factory app      00 00 00010000 00100000
+I (92) boot: End of partition table
+I (96) boot_comm: chip revision: 1, min. application chip revision: 0
+I (103) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x21fe0 (139232) map
+I (161) esp_image: segment 1: paddr=0x00032008 vaddr=0x3ffb0000 size=0x030f4 ( 12532) load
+I (166) esp_image: segment 2: paddr=0x00035104 vaddr=0x40080000 size=0x00400 (  1024) load
+0x40080000: _WindowOverflow4 at /home/arnaud/esp/esp-idf/components/freertos/xtensa_vectors.S:1779
+
+I (168) esp_image: segment 3: paddr=0x0003550c vaddr=0x40080400 size=0x0ab04 ( 43780) load
+I (195) esp_image: segment 4: paddr=0x00040018 vaddr=0x400d0018 size=0x90ca4 (593060) map
+0x400d0018: _stext at ??:?
+
+I (404) esp_image: segment 5: paddr=0x000d0cc4 vaddr=0x4008af04 size=0x04f10 ( 20240) load
+0x4008af04: rtc_clk_32k_enable at /home/arnaud/esp/esp-idf/components/soc/esp32/rtc_clk.c:517
+
+I (422) boot: Loaded app from partition at offset 0x10000
+I (422) boot: Disabling RNG early entropy source...
+I (422) cpu_start: Pro cpu up.
+I (426) cpu_start: Application information:
+I (431) cpu_start: Project name:     esp-idf
+I (436) cpu_start: App version:      41e50e9
+I (441) cpu_start: Compile time:     Apr  5 2020 10:38:17
+I (447) cpu_start: ELF file SHA256:  a601c70fd72ba8df...
+I (453) cpu_start: ESP-IDF:          v3.3.1
+I (458) cpu_start: Starting app cpu, entry point is 0x400810f8
+0x400810f8: call_start_cpu1 at /home/arnaud/esp/esp-idf/components/esp32/cpu_start.c:269
+
+I (0) cpu_start: App cpu up.
+I (468) heap_init: Initializing. RAM available for dynamic allocation:
+I (475) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (481) heap_init: At 3FFB9EC0 len 00026140 (152 KiB): DRAM
+I (487) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (493) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (500) heap_init: At 4008FE14 len 000101EC (64 KiB): IRAM
+I (506) cpu_start: Pro cpu start user code
+I (189) cpu_start: Starting scheduler on PRO CPU.
+I (0) cpu_start: Starting scheduler on APP CPU.
+I (270) wifi: wifi driver task: 3ffc1b00, prio:23, stack:3584, core=0
+I (270) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (270) system_api: Base MAC address is not set, read default base MAC address from BLK0 of EFUSE
+I (300) wifi: wifi firmware version: ac331d7
+I (310) wifi: config NVS flash: enabled
+I (310) wifi: config nano formating: disabled
+I (310) wifi: Init dynamic tx buffer num: 32
+I (310) wifi: Init data frame dynamic rx buffer num: 32
+I (310) wifi: Init management frame dynamic rx buffer num: 32
+I (320) wifi: Init management short buffer num: 32
+I (320) wifi: Init static rx buffer size: 1600
+I (330) wifi: Init static rx buffer num: 10
+I (330) wifi: Init dynamic rx buffer num: 32
+I (420) phy: phy_version: 4102, 2fa7a43, Jul 15 2019, 13:06:06, 0, 0
+I (430) wifi: mode : sta (3c:71:bf:0d:7e:1c) + softAP (3c:71:bf:0d:7e:1d)
+I (430) wifi: Total power save buffer number: 16
+I (430) wifi: Init max length of beacon: 752/752
+I (440) wifi: Init max length of beacon: 752/752
+W (440) wifi: [beacon]interval:100ms
+I (450) mesh: <nvs>read layer:1
+I (450) mesh: <nvs>read assoc:1
+I (1440) wifi: Set ps type: 0
+
+I (1450) wifi: mode : sta (3c:71:bf:0d:7e:1c)
+I (1450) mesh: <MESH_NWK_LOOK_FOR_NETWORK>need_scan:0x1, need_scan_router:0x0, look_for_nwk_count:1
+I (1450) mesh_main: <MESH_EVENT_STARTED>ID:77:77:77:77:77:77
+I (1450) mesh_main: mesh starts successfully, heap:185952, root not fixed
+
+I (1750) mesh: [S1]raspberryWIFI, b8:27:eb:22:ef:da, channel:7, rssi:-53
+I (1750) mesh: find router:[ssid_len:13]raspberryWIFI, rssi:-53, b8:27:eb:22:ef:da(encrypted), new channel:7, old channel:0
+I (1760) mesh: [FIND][ch:7]AP:1, otherID:0, MAP:0, idle:0, candidate:0, root:0[b8:27:eb:22:ef:da]router found
+I (1770) mesh: [FIND:1]find a network, channel:7, cfg<channel:7, router:raspberryWIFI, 00:00:00:00:00:00>
+
+I (1780) mesh_main: <MESH_EVENT_FIND_NETWORK>new channel:7, router BSSID:00:00:00:00:00:00
+I (1790) wifi: mode : sta (3c:71:bf:0d:7e:1c) + softAP (3c:71:bf:0d:7e:1d)
+W (1800) wifi: <MESH AP>adjust channel:7, secondary channel offset:1(40U)
+I (1800) wifi: Total power save buffer number: 16
+I (2110) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (2110) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (2120) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:19,-120]
+I (2120) mesh: 6104[SCAN]init rc[ttl:127/votes:1][3c:71:bf:0d:7e:19,-120]
+I (2130) mesh: 1250, vote myself, router rssi:-54 > voted rc_rssi:-120
+I (2140) mesh: [SCAN:1/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-54,reason:0,votes:1,idle][mine:1,voter:1(1.00)percent:0.90][128,1,3c:71:bf:0d:7e:1d]
+
+I (2450) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (2460) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (2460) mesh: [SCAN:2/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-54,reason:0,votes:1,idle][mine:1,voter:2(0.50)percent:0.90][128,1,3c:71:bf:0d:7e:1d]
+
+I (2780) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (2780) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (2790) mesh: [SCAN:3/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-54,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:7e:1d]
+
+I (3110) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (3110) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (3120) mesh: [SCAN:4/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-53,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:7e:1d]
+
+I (3430) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (3440) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (3450) mesh: [SCAN:5/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-52,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:7e:1d]
+
+I (3760) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (3760) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (3770) mesh: [SCAN:6/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-51,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:7e:1d]
+
+I (4090) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (4090) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (4100) mesh: [SCAN:7/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-53,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:7e:1d]
+
+I (4410) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (4420) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (4420) mesh: [SCAN:8/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-53,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:7e:1d]
+
+I (4740) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (4740) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (4750) mesh: [SCAN:9/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-53,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:7e:1d]
+
+I (5070) mesh: [SCAN][ch:7]AP:2, other(ID:0, RD:0), MAP:1, idle:1, candidate:1, root:0, topMAP:0[c:1,i:1][b8:27:eb:22:ef:da]router found<>
+I (5070) mesh: 1022<pre>my_vote_num:0, voter_num/max_connection:6, 2nd_layer_count:0
+I (5080) mesh: [SCAN:10/10]rc[128][3c:71:bf:0d:7e:1d,-54], self[3c:71:bf:0d:7e:1c,-53,reason:0,votes:2,idle][mine:2,voter:2(1.00)percent:0.90][128,2,3c:71:bf:0d:7e:1d]
+
+I (5100) mesh: <nvs>write layer:0
+I (5100) mesh: <nvs>write assoc:0
+W (5100) wifi: [beacon]interval:100ms
+I (5100) mesh: [DONE]connect to router:raspberryWIFI, channel:7, rssi:-53, b8:27:eb:22:ef:da[layer:0, assoc:0], my_vote_num:2/voter_num:2, rc[3c:71:bf:0d:7e:1d/-54/1]
+I (5240) wifi: new:<7,1>, old:<7,1>, ap:<7,1>, sta:<7,0>, prof:7
+I (5240) wifi: state: init -> auth (b0)
+I (5250) wifi: state: auth -> assoc (0)
+I (5260) wifi: state: assoc -> run (10)
+I (5280) wpa: <EAPOL>state:6
+I (5280) wpa: <EAPOL>receiving the 1/4 EAPOL-Key, state:6
+I (5290) wpa: <EAPOL>state:7
+I (5290) wpa: <EAPOL>receiving the 3/4 EAPOL-Key, state:7
+I (5290) wifi: connected with raspberryWIFI, aid = 1, channel 7, BW20, bssid = b8:27:eb:22:ef:da
+I (5290) wifi: security type: 3, phy: bgn, rssi: -52
+I (5370) wifi: pm start, type: 0
+
+I (5370) wifi: AP's beacon interval = 102400 us, DTIM period = 2
+E (5380) event: invalid static ip
+I (5380) mesh: [scan]new scanning time:600ms
+W (5380) wifi: [beacon]new interval:300ms
+I (5410) mesh: <nvs>write layer:1
+I (5410) mesh_main: <MESH_EVENT_PARENT_CONNECTED>layer:0-->1, parent:b8:27:eb:22:ef:da<ROOT>, ID:77:77:77:77:77:77
+I (5410) mesh_main: is root -> don't send
+I (5410) mesh_main: <MESH_EVENT_TODS_REACHABLE>state:0
+I (5420) mesh_main: <MESH_EVENT_ROOT_ADDRESS>root address:3c:71:bf:0d:7e:1d
+I (6760) mesh_main: <MESH_EVENT_ROOT_GOT_IP>sta ip: 192.168.4.4, mask: 255.255.255.0, gw: 192.168.4.1
+I (6760) event: sta ip: 192.168.4.4, mask: 255.255.255.0, gw: 192.168.4.1
+I (7510) wifi: new:<7,1>, old:<7,1>, ap:<7,1>, sta:<7,0>, prof:7
+I (7510) wifi: station: 3c:71:bf:0d:7e:18 join, AID=1, bgn, 40U
+W (7510) mesh_main: <MESH_EVENT_ROUTING_TABLE_ADD>add 1, new:2
+I (7520) mesh: <nvs>write assoc:1
+I (7520) mesh_main: <MESH_EVENT_CHILD_CONNECTED>aid:1, 3c:71:bf:0d:7e:18
+---->receive data: 1
+---->receive data: 2
+---->receive data: 3
+---->receive data: 4
+---->receive data: 5
+---->receive data: 6
+---->receive data: 7
+---->receive data: 8
+---->receive data: 9
+---->receive data: 10
+---->receive data: 11
+---->receive data: 12
+---->receive data: 13
+---->receive data: 14
+---->receive data: 15
+---->receive data: 16
+---->receive data: 17
+---->receive data: 18
+---->receive data: 19
+---->receive data: 20
+---->receive data: 21
+---->receive data: 22
+---->receive data: 23
+---->receive data: 24
+---->receive data: 25
+---->receive data: 26
+---->receive data: 27
+---->receive data: 28
+---->receive data: 29
+---->receive data: 30
+---->receive data: 31
+---->receive data: 32
+---->receive data: 33
+---->receive data: 34
+---->receive data: 35
+---->receive data: 36
+---->receive data: 37
+---->receive data: 38
+---->receive data: 39
+---->receive data: 40
+---->receive data: 41
+---->receive data: 42
+---->receive data: 43
+---->receive data: 44
+---->receive data: 45
+---->receive data: 46
+---->receive data: 47
+---->receive data: 48
+---->receive data: 49
+---->receive data: 50
+---->receive data: 51
+---->receive data: 52
+---->receive data: 53
+---->receive data: 54
+---->receive data: 55
+---->receive data: 56
+---->receive data: 57
+---->receive data: 58
+---->receive data: 59
+---->receive data: 60
+---->receive data: 61
+---->receive data: 62
+---->receive data: 63
+---->receive data: 64
+---->receive data: 65
+---->receive data: 66
+---->receive data: 67
+---->receive data: 68
+---->receive data: 69
+---->receive data: 70
+---->receive data: 71
+---->receive data: 72
+---->receive data: 73
+---->receive data: 74
+---->receive data: 75
+---->receive data: 76
+---->receive data: 77
+---->receive data: 78
+---->receive data: 79
+---->receive data: 80
+---->receive data: 81
+---->receive data: 82
+---->receive data: 83
+

@@ -1,0 +1,8 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{struct} \PYG{n}{record}\PYG{p}{\PYGZob{}}
+    \PYG{k+kt}{int} \PYG{n}{sock}\PYG{p}{;}
+    \PYG{k+kt}{uint8\PYGZus{}t} \PYG{n}{addr}\PYG{p}{[}\PYG{l+m+mi}{6}\PYG{p}{];}
+\PYG{p}{\PYGZcb{};}
+
+\PYG{k}{static} \PYG{k}{struct} \PYG{n}{record}\PYG{o}{*} \PYG{n}{matching\PYGZus{}table}\PYG{p}{[}\PYG{n}{MATCHING\PYGZus{}TABLE\PYGZus{}SIZE}\PYG{p}{];}
+\end{Verbatim}

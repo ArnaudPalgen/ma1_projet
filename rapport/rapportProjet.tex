@@ -1,4 +1,5 @@
 \documentclass[a4paper, 12pt]{report}
+%\usepackage[left=2cm, right=5cm, top=2cm]{geometry}
 \usepackage[table, dvipsnames]{xcolor}
 \usepackage{soul}
 \usepackage{alltt}
@@ -28,6 +29,11 @@ linkcolor=red,
 \usepackage[outputdir=out]{minted}
 
 \usepackage{pgf-umlsd}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\input{flow}
+
+
 %\setcounter{tocdepth}{5} %pour l'apparition dans la table des matières des susubsections
 %\setcounter{secnumdepth}{5}%pour la numérotation dans le corps du document des susubsections
 
@@ -44,7 +50,8 @@ linkcolor=red,
 \newcommand{\todo}[1]{\textcolor{ForestGreen}{\textbf{TODO: #1}}}
 \newcommand{\rreq}{\textsc{rreq}}
 \newcommand{\rrep}{\textsc{rrep}}
-\newcommand{\rrer}{\textsc{rrer}}
+\newcommand{\rerr}{\textsc{rerr}}
+\newcommand{\ip}{\textsc{ip}}
 
 
 
@@ -112,7 +119,7 @@ Arnaud \textsc{Palgen}
     \begin{figure}[H]
         \centering
         \includegraphics[scale=0.4]{images/traditional-network-architecture.png}
-        \caption{Réseau \wifi\ traditionnel \cite{esp-mesh_w}}
+        \caption{Réseau \wifi\ traditionnel \cite{esp-mesh}}
         \label{traditional-network-pic}
     \end{figure}
 
@@ -129,7 +136,7 @@ Arnaud \textsc{Palgen}
     \begin{figure}[H]
         \centering
         \includegraphics[scale=0.4]{images/mesh-esp-mesh-network-architecture.png}
-        \caption{Réseau \mesh\ \cite{esp-mesh_w}}
+        \caption{Réseau \mesh\ \cite{esp-mesh}}
         \label{mesh-network-pic}
     \end{figure}
 
@@ -160,8 +167,26 @@ Arnaud \textsc{Palgen}
 
 \input{c_implementation.tex}
 
+
 %\listoffigures
-\bibliography{biblio}{}
+
+
+\appendix
+\addcontentsline{toc}{chapter}{Annexes}
+\chapter{Multicasting et Broadcasting avec \espmesh}
+\label{annexeA}
+\input{annexeESPMESH}
+\newpage
+
+\chapter{Extrait de code de notre "proxy"}
+\label{annexeB}
+\input{annexeCODE_PROXY}
+
+\chapter{Code de notre dissecteur}
+\label{annexeC}
+\input{annexeCODE_DISSECTEUR}
+
+\bibliography{bibliography}{}
 \bibliographystyle{plain}
 
 \end{document}

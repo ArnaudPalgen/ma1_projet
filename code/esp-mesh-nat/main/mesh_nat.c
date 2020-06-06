@@ -220,6 +220,7 @@ void esp_mesh_external_rx(void *arg){
 
         if(select(maxSock+1, &readSet, NULL, NULL, &timeout) < 0){
             ESP_LOGE(TAG, "select error");
+            //mettre un continue
         }
         
         for(int i=0; i<MATCHING_TABLE_SIZE; i++){
@@ -235,7 +236,8 @@ void esp_mesh_external_rx(void *arg){
                     ESP_LOGI(TAG, "socket %d closed by peer", sock);
                     shutdown(sock, 0);
                     close(sock);
-                    FD_CLR(sock, &readSet);
+                    FD_CLR(sock, &readSet);//correct ?
+                    //todo supprimer de la liste
                 }else if(recv_value < 0){
                     ESP_LOGE(TAG, "recv error");
                 }else{

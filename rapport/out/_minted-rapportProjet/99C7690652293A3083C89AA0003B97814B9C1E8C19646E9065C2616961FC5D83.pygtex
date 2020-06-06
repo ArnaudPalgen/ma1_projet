@@ -1,0 +1,44 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+    \PYG{k+kt}{void} \PYG{n+nf}{esp\PYGZus{}mesh\PYGZus{}external\PYGZus{}rx}\PYG{p}{(}\PYG{k+kt}{void} \PYG{o}{*}\PYG{n}{arg}\PYG{p}{)\PYGZob{}}
+       \PYG{k}{struct} \PYG{n}{sockaddr\PYGZus{}in} \PYG{n}{src}\PYG{p}{;}
+       \PYG{k+kt}{socklen\PYGZus{}t} \PYG{n}{sockLen}\PYG{p}{;}
+
+       \PYG{n}{mesh\PYGZus{}addr\PYGZus{}t} \PYG{n}{mesh\PYGZus{}dest\PYGZus{}addr}\PYG{p}{;}
+       \PYG{n}{mesh\PYGZus{}data\PYGZus{}t} \PYG{n}{mesh\PYGZus{}data}\PYG{p}{;}
+       \PYG{n}{mesh\PYGZus{}data}\PYG{p}{.}\PYG{n}{proto} \PYG{o}{=} \PYG{n}{MESH\PYGZus{}PROTO\PYGZus{}BIN}\PYG{p}{;}
+
+       \PYG{k+kt}{uint8\PYGZus{}t} \PYG{o}{*}\PYG{n}{mac\PYGZus{}addr}\PYG{p}{;}
+       \PYG{k}{static} \PYG{n}{fd\PYGZus{}set} \PYG{n}{readSet}\PYG{p}{;}\PYG{c+c1}{//set of file descriptors}
+       \PYG{k}{struct} \PYG{n}{timeval} \PYG{n}{timeout} \PYG{o}{=} \PYG{p}{\PYGZob{}.}\PYG{n}{tv\PYGZus{}usec} \PYG{o}{=} \PYG{l+m+mi}{500000}\PYG{c+cm}{/*in microseconds*/}\PYG{p}{\PYGZcb{};}
+       \PYG{k}{while}\PYG{p}{(}\PYG{n}{is\PYGZus{}running}\PYG{p}{)\PYGZob{}}
+           \PYG{n}{FD\PYGZus{}ZERO}\PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n}{readSet}\PYG{p}{);}\PYG{c+c1}{//clear the set}
+           \PYG{c+cm}{/*add sockets from the matching table to the set*/}
+           \PYG{k}{for}\PYG{p}{(}\PYG{k+kt}{int} \PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;} \PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{MATCHING\PYGZus{}TABLE\PYGZus{}SIZE}\PYG{p}{;} \PYG{n}{i}\PYG{o}{++}\PYG{p}{)\PYGZob{}}
+               \PYG{c+cm}{/*...*/}
+               \PYG{n}{currentSock}\PYG{o}{=}\PYG{n}{matching\PYGZus{}table}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{sock}\PYG{p}{;}
+               \PYG{n}{FD\PYGZus{}SET}\PYG{p}{(}\PYG{n}{currentSock}\PYG{p}{,}\PYG{o}{\PYGZam{}}\PYG{n}{readSet}\PYG{p}{);}
+               \PYG{c+cm}{/*...*/}
+           \PYG{p}{\PYGZcb{}}
+           \PYG{k}{if}\PYG{p}{(}\PYG{n}{select}\PYG{p}{(}\PYG{n}{maxSock}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{o}{\PYGZam{}}\PYG{n}{readSet}\PYG{p}{,} \PYG{n+nb}{NULL}\PYG{p}{,} \PYG{n+nb}{NULL}\PYG{p}{,} \PYG{o}{\PYGZam{}}\PYG{n}{timeout}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{0}\PYG{p}{)\PYGZob{}}
+               \PYG{n}{ESP\PYGZus{}LOGE}\PYG{p}{(}\PYG{n}{TAG}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}select error\PYGZdq{}}\PYG{p}{);}
+               \PYG{k}{continue}\PYG{p}{;}
+           \PYG{p}{\PYGZcb{}}
+           \PYG{c+cm}{/*search for the record that corresponds to the socket that}
+\PYG{c+cm}{            *received data}
+\PYG{c+cm}{            */}
+           \PYG{k}{for}\PYG{p}{(}\PYG{k+kt}{int} \PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;} \PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{MATCHING\PYGZus{}TABLE\PYGZus{}SIZE}\PYG{p}{;} \PYG{n}{i}\PYG{o}{++}\PYG{p}{)\PYGZob{}}
+               \PYG{c+cm}{/*...*/}
+               \PYG{n}{sock} \PYG{o}{=} \PYG{n}{matching\PYGZus{}table}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{sock}\PYG{p}{;}
+               \PYG{n}{mac\PYGZus{}addr} \PYG{o}{=} \PYG{n}{matching\PYGZus{}table}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{addr}\PYG{p}{;}
+               \PYG{k}{if}\PYG{p}{(}\PYG{n}{FD\PYGZus{}ISSET}\PYG{p}{(}\PYG{n}{sock}\PYG{p}{,} \PYG{o}{\PYGZam{}}\PYG{n}{readSet}\PYG{p}{))\PYGZob{}}\PYG{c+c1}{//we found the record}
+                   \PYG{n}{recv\PYGZus{}value} \PYG{o}{=} \PYG{n}{recvfrom}\PYG{p}{(}\PYG{n}{sock}\PYG{p}{,} \PYG{n}{rx\PYGZus{}buf}\PYG{p}{,} \PYG{k}{sizeof}\PYG{p}{(}\PYG{n}{rx\PYGZus{}buf}\PYG{p}{),} \PYG{l+m+mi}{0}\PYG{p}{,}
+                       \PYG{o}{\PYGZam{}}\PYG{n}{src}\PYG{p}{,} \PYG{o}{\PYGZam{}}\PYG{n}{sockLen}\PYG{p}{);}
+                   \PYG{c+cm}{/*...*/}
+                   \PYG{n}{mesh\PYGZus{}data}\PYG{p}{.}\PYG{n}{size} \PYG{o}{=} \PYG{k}{sizeof}\PYG{p}{(}\PYG{n}{rx\PYGZus{}buf}\PYG{p}{);}\PYG{c+c1}{//set mesh data}
+                   \PYG{n}{mesh\PYGZus{}data}\PYG{p}{.}\PYG{n}{data} \PYG{o}{=} \PYG{n}{rx\PYGZus{}buf}\PYG{p}{;}
+                   \PYG{n}{memcpy}\PYG{p}{(}\PYG{n}{mesh\PYGZus{}dest\PYGZus{}addr}\PYG{p}{.}\PYG{n}{addr}\PYG{p}{,} \PYG{n}{mac\PYGZus{}addr}\PYG{p}{,} \PYG{l+m+mi}{6}\PYG{p}{);}\PYG{c+c1}{//set mesh addr}
+                   \PYG{c+cm}{/*send data*/}
+                   \PYG{n}{err}\PYG{o}{=}\PYG{n}{esp\PYGZus{}mesh\PYGZus{}send}\PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n}{mesh\PYGZus{}dest\PYGZus{}addr}\PYG{p}{,}\PYG{o}{\PYGZam{}}\PYG{n}{mesh\PYGZus{}data}\PYG{p}{,}
+                       \PYG{n}{MESH\PYGZus{}DATA\PYGZus{}P2P}\PYG{p}{,}\PYG{n+nb}{NULL}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{);}
+                   \PYG{c+cm}{/*...*/}
+\end{Verbatim}
