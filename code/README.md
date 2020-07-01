@@ -11,17 +11,17 @@
 - Projets IDF
     - Installer la version 3.3.1 d'idf. (https://docs.espressif.com/projects/esp-idf/en/v3.3.1/get-started/index.html)
     - Se rendre dans le répertoire courant du projet
-    - Sourcer le fichier export.sh (. $IDF_PATH/export.sh)
+    - Sourcer le fichier export.sh (`. $IDF_PATH/export.sh`)
     - idf.py menuconfig
     - Se rendre dans le meu "ESP-MESH", "ESP-MESH configuration" ou "SOCKET" en fonction du projet
     - Configuer le SSID du point d'accès Wi-FI, mot de passe, channel
     - Sortir de la configuration
-    - Compiler le projet (idf.py build)
-    - Flasher le projet (idf.py -p <port> flash)
-    - Communication série avec l'esp: idf.py -p (port) monitor
+    - Compiler le projet (`idf.py build`)
+    - Flasher le projet (`idf.py -p <port> flash`)
+    - Communication série avec l'esp: `idf.py -p (port) monitor`
 
 - Serveur TCP
-    l'éxécuter via: python3 tcpServer.py <adresse IPv4> <PORT>
+    L'éxécuter via: `python3 tcpServer.py <adresse IPv4> <PORT>`
 
 - Dissecteur ESP-MESH
     - dans Wireshark, se rendre dans aide -> à propos de Wireshark -> Dossiers
