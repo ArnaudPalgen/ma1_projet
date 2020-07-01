@@ -1,3 +1,10 @@
+/**
+ * @file esp-now.c
+ * @author Arnaud Palgen
+ * @brief 
+ * @date 09-06-2020
+ * 
+ */
 #include <string.h>
 #include "esp_wifi.h"
 #include "esp_event_loop.h"
@@ -8,14 +15,21 @@
 
 #define CHANNEL 7
 #define ESPNOW_WIFI_MODE WIFI_MODE_STA // Wi-Fi mode: sta, ap or sta+ap
-#define ESPNOW_WIFI_IF ESP_IF_WIFI_STA // Wi-Fi interface sta or ap
-#define IS_SOURCE false
+#define ESPNOW_WIFI_IF ESP_IF_WIFI_STA // Wi-Fi interface: sta or ap
+#define IS_SOURCE true // if true send data else receive data
 
 static const char *TAG = "espnow";
 
-static const uint8_t broadcast_addr[ESP_NOW_ETH_ALEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+static const uint8_t broadcast_addr[ESP_NOW_ETH_ALEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; //broadcast adress
 static uint8_t myAddress[ESP_NOW_ETH_ALEN];
 
+
+/**
+ * @brief display an array of uint8_t
+ * 
+ * @param array array of uint8_t to display
+ * @param size number of items in the array
+ */
 void printArray(const uint8_t *array, int size){
 	for(int i=0; i<size; i++){
 	    printf("%d ",array[i]);
@@ -23,8 +37,14 @@ void printArray(const uint8_t *array, int size){
 	printf("\n");
 }
 
-static esp_err_t event_handler(void *ctx, system_event_t *event)
-{
+/**
+ * @brief processes the received event
+ * 
+ * @param ctx 
+ * @param event 
+ * @return esp_err_t 
+ */
+static esp_err_t event_handler(void *ctx, system_event_t *event){
     switch(event->event_id) {
     case SYSTEM_EVENT_STA_START:
         ESP_LOGI(TAG, "Wi-Fi started");
@@ -35,15 +55,33 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
+/**
+ * @brief send callback function
+ * 
+ * @param mac_addr 
+ * @param status 
+ */
 void espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status){
     ESP_LOGI(TAG, "send callback function");
 }
 
+/**
+ * @brief 
+ * 
+ * @param mac_addr 
+ * @param data 
+ * @param data_len 
+ */
 void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len){
     ESP_LOGI(TAG, "receive %d bytes:", data_len);
     printArray(data, data_len);
 }
 
+/**
+ * @brief task that sends packets in broadcast
+ * 
+ * @param arg 
+ */
 void esp_now_tx(void *arg){
 
     const uint8_t data[20]= {238, 238, 238, 238, 238, 238, 238, 

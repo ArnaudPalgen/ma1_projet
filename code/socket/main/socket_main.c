@@ -1,3 +1,10 @@
+/**
+ * @file socket_main.c
+ * @author Arnaud Palgen
+ * @brief 
+ * @date 09-06-2020
+ * 
+ */
 #include <string.h>
 #include "esp_wifi.h"
 #include "esp_system.h"
@@ -20,7 +27,10 @@
 static const char *TAG = "SOCKET";
 static int retry = 0;
 
-
+/**
+ * @brief send tcp frame to DEST_ADDR, DEST_PORT
+ * 
+ */
 void mySend(){
 
     /* data to send */
@@ -80,7 +90,13 @@ void mySend(){
     ESP_LOGI(TAG, "Message sent");
 }
 
-
+/**
+ * @brief processes the received event
+ * 
+ * @param ctx 
+ * @param event 
+ * @return esp_err_t 
+ */
 static esp_err_t event_handler(void *ctx, system_event_t *event){
     switch (event->event_id) {
     case SYSTEM_EVENT_STA_START:

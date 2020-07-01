@@ -1,3 +1,10 @@
+/**
+ * @file mesh_main.c
+ * @author Arnaud Palgen
+ * @brief 
+ * @date 09-06-2020
+ * 
+ */
 #include <string.h>
 #include "esp_wifi.h"
 #include "esp_system.h"
@@ -12,7 +19,7 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
-#define DEST_ADDR "192.168.0.105"
+#define DEST_ADDR "192.168.0.102"
 #define PORT 5001
 
 #define RX_BUF_SIZE  20
@@ -27,6 +34,11 @@ static bool is_mesh_connected = false;
 static mesh_addr_t mesh_parent_addr;
 static int mesh_layer = -1;
 
+/**
+ * @brief send data to an internal or external device
+ * 
+ * @param arg 
+ */
 void esp_mesh_tx(void *arg){
     is_running = true;
     esp_err_t err;
@@ -64,6 +76,12 @@ void esp_mesh_tx(void *arg){
 
 }
 
+/**
+ * @brief display an array of uint8_t
+ * 
+ * @param array array of uint8_t to display
+ * @param size number of items in the array
+ */
 void printArray(uint8_t *array, int size){
 	for(int i=0; i<size; i++){
 	    printf("%d ",array[i]);
@@ -71,6 +89,11 @@ void printArray(uint8_t *array, int size){
 	printf("\n");
 }
 
+/**
+ * @brief receive data to an external device from an external device
+ * 
+ * @param arg 
+ */
 void esp_mesh_external_rx(void *arg){
     esp_err_t err;
 
@@ -173,7 +196,11 @@ void esp_mesh_external_rx(void *arg){
     vTaskDelete(NULL);
 
 }
-
+/**
+ * @brief receive data from an internal device
+ * 
+ * @param arg 
+ */
 void esp_mesh_rx(void *arg){
     is_running = true;
     esp_err_t err = ESP_OK;
@@ -218,7 +245,10 @@ void esp_mesh_rx(void *arg){
     vTaskDelete(NULL);
 
 }
-
+/**
+ * @brief create task for external communications
+ * 
+ */
 void start_external_comm(void){
     static bool is_comm_external_started = false;
     
@@ -229,8 +259,12 @@ void start_external_comm(void){
     }
 }
 
-esp_err_t esp_mesh_comm_p2p_start(void)
-{
+/**
+ * @brief create task for internal communications
+ * 
+ * @return esp_err_t 
+ */
+esp_err_t esp_mesh_comm_p2p_start(void){
     static bool is_comm_p2p_started = false;
     if (!is_comm_p2p_started) {
         is_comm_p2p_started = true;
@@ -240,17 +274,22 @@ esp_err_t esp_mesh_comm_p2p_start(void)
         }else{
             ESP_LOGI(MESH_TAG, "is child -> prepare to send...");
             xTaskCreate(esp_mesh_tx, "MPTX", 3072, NULL, 5, NULL);
-        }
-        
+        }   
         
     }
     return ESP_OK;
 }
 
+/**
+ * @brief processes the received event
+ * 
+ * based on https://github.com/espressif/esp-idf/blob/v3.3.1/examples/mesh/internal_communication/main/mesh_main.c (accessed 9-06-2020)
+ * 
+ * @param event 
+ */
 void mesh_event_handler(mesh_event_t event)
 {
-    //ensemble d'adresse mesh union(mac address, mip address mip_t(ipv4, port))
-    mesh_addr_t id = {0,};// id du reseau mesh
+    mesh_addr_t id = {0,};// mesh id
     static uint8_t last_layer = 0;
     ESP_LOGD(MESH_TAG, "esp_event_handler:%d", event.id);
 
@@ -289,7 +328,6 @@ void mesh_event_handler(mesh_event_t event)
     case MESH_EVENT_NO_PARENT_FOUND:
         ESP_LOGI(MESH_TAG, "<MESH_EVENT_NO_PARENT_FOUND>scan times:%d",
                  event.info.no_parent.scan_times);
-        /* TODO handler for the failure */
         break;
     case MESH_EVENT_PARENT_CONNECTED:
         esp_mesh_get_id(&id);
@@ -301,19 +339,17 @@ void mesh_event_handler(mesh_event_t event)
                  esp_mesh_is_root() ? "<ROOT>" :
                  (mesh_layer == 2) ? "<layer2>" : "", MAC2STR(id.addr));
         last_layer = mesh_layer;
-        //mesh_connected_indicator(mesh_layer); for light
         is_mesh_connected = true;
         if ( esp_mesh_is_root()) {
             tcpip_adapter_dhcpc_start(TCPIP_ADAPTER_IF_STA);
         }
-        esp_mesh_comm_p2p_start();//--------------------------------------------------------------------------------------------
+        esp_mesh_comm_p2p_start();
         break;
     case MESH_EVENT_PARENT_DISCONNECTED:
         ESP_LOGI(MESH_TAG,
                  "<MESH_EVENT_PARENT_DISCONNECTED>reason:%d",
                  event.info.disconnected.reason);
         is_mesh_connected = false;
-        //mesh_disconnected_indicator();
         mesh_layer = esp_mesh_get_layer();
         break;
     case MESH_EVENT_LAYER_CHANGE:
@@ -323,20 +359,18 @@ void mesh_event_handler(mesh_event_t event)
                  esp_mesh_is_root() ? "<ROOT>" :
                  (mesh_layer == 2) ? "<layer2>" : "");
         last_layer = mesh_layer;
-        //mesh_connected_indicator(mesh_layer); for light
         break;
-    case MESH_EVENT_ROOT_ADDRESS:// on a l'adresse de root
+    case MESH_EVENT_ROOT_ADDRESS:
         ESP_LOGI(MESH_TAG, "<MESH_EVENT_ROOT_ADDRESS>root address:"MACSTR"",
                  MAC2STR(event.info.root_addr.addr));
         break;
     case MESH_EVENT_ROOT_GOT_IP:
-        /* root starts to connect to server */
         ESP_LOGI(MESH_TAG,
                  "<MESH_EVENT_ROOT_GOT_IP>sta ip: " IPSTR ", mask: " IPSTR ", gw: " IPSTR,
                  IP2STR(&event.info.got_ip.ip_info.ip),
                  IP2STR(&event.info.got_ip.ip_info.netmask),
                  IP2STR(&event.info.got_ip.ip_info.gw));
-        start_external_comm();//---------------------------------------------------------------------------------------------
+        start_external_comm();
         break;
     case MESH_EVENT_ROOT_LOST_IP:
         ESP_LOGI(MESH_TAG, "<MESH_EVENT_ROOT_LOST_IP>");

@@ -1,3 +1,9 @@
+/**
+ * @file mesh-internal.c
+ * @author Arnaud Palgen
+ * @brief 
+ * @date 09-06-2020
+ */
 #include <string.h>
 #include "esp_wifi.h"
 #include "esp_system.h"
@@ -14,7 +20,12 @@
 static const char *TAG = "mesh_internal";
 static const uint8_t MESH_ID[6] = { 0x77, 0x77, 0x77, 0x77, 0x77, 0x77}; // mesh id
 
-
+/**
+ * @brief display an array of uint8_t
+ * 
+ * @param array array of uint8_t to display
+ * @param size number of items in the array
+ */
 void printArray(uint8_t *array, int size){
 	for(int i=0; i<size; i++){
 	    printf("%d ",array[i]);
@@ -22,6 +33,11 @@ void printArray(uint8_t *array, int size){
 	printf("\n");
 }
 
+/**
+ * @brief receives data from an internal device
+ * 
+ * @param arg 
+ */
 void esp_mesh_rx(void *arg){
     esp_err_t err;
 
@@ -75,6 +91,11 @@ void esp_mesh_rx(void *arg){
 
 }
 
+/**
+ * @brief send data to an internal device
+ * 
+ * @param arg 
+ */
 void esp_mesh_tx(void *arg){
     esp_err_t err;
 
@@ -109,6 +130,10 @@ void esp_mesh_tx(void *arg){
 
 }
 
+/**
+ * @brief create tasks for p2p communications
+ * 
+ */
 void esp_mesh_comm_p2p_start(){
     static bool p2p_started = false;
     if(!p2p_started){
@@ -128,6 +153,11 @@ void esp_mesh_comm_p2p_start(){
 
 }
 
+/**
+ * @brief processes the received event
+ * 
+ * @param event 
+ */
 void mesh_event_handler(mesh_event_t event){
     
     if (event.id == MESH_EVENT_PARENT_CONNECTED){

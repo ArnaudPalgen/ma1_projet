@@ -1,4 +1,4 @@
-menu "ESP-MESH configuration"
+menu "ESP-MESH Configuration"
 
     config MESH_CHANNEL
         int "channel"
@@ -71,4 +71,3 @@ menu "ESP-MESH configuration"
         help
             The number of devices over the network(max: 300).
 endmenu
-
