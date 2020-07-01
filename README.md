@@ -1,5 +1,5 @@
 # Réseau Wi-Fi multi-sauts sur platforme ESP
-#### Projet de master 1 en sciences informatiques à l'Université de Mons.
+Projet de master 1 en sciences informatiques à l'Université de Mons.
 
 *Auteur*: **Arnaud Palgen**<br />
 *Directeur*: **Bruno Quoitin**<br />
