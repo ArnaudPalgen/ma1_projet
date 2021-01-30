@@ -1,4 +1,4 @@
-# Réseau Wi-Fi multi-sauts sur platforme ESP
+# Réseau Wi-Fi multi-sauts sur plateforme ESP
 Projet de master 1 en sciences informatiques à l'Université de Mons.
 
 *Auteur*: **Arnaud Palgen**<br />
